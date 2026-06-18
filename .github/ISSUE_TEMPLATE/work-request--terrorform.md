@@ -1,7 +1,7 @@
 ---
 name: 'Work request: Terrorform'
-about: Work request for Terrorform
-title: Work request for Terrorform
+about: Do a change in repo Terrorform
+title: 'Work request for Terrorform: '
 labels: ''
 assignees: danielsawitzki77
 
