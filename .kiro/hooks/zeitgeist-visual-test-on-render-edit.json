@@ -1,0 +1,13 @@
+{
+  "name": "[Zeitgeist] Visual Test on Render Edit",
+  "version": "1.0.0",
+  "description": "When core rendering files are edited, runs headless visual tests for immediate regression feedback.",
+  "when": {
+    "type": "fileEdited",
+    "patterns": ["**/Renderer.cpp", "**/EffectsManager.cpp", "**/HUD.cpp", "**/AssetManager.cpp"]
+  },
+  "then": {
+    "type": "runCommand",
+    "command": "build_test_visual.bat"
+  }
+}

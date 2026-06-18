@@ -1,0 +1,12 @@
+{
+  "name": "Check Issues Now",
+  "version": "1.0.0",
+  "description": "Manually trigger a check of all monitored GitHub repos for open issues. Use this to kick off the autonomous work cycle.",
+  "when": {
+    "type": "userTriggered"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Check all monitored GitHub repos for open issues. Run: gh issue list --repo danielsawitzki77/Zeitgeist-Evolved --state open --json number,title,labels,assignees,createdAt && gh issue list --repo danielsawitzki77/SDL_VisualTest --state open --json number,title,labels,assignees,createdAt && gh issue list --repo danielsawitzki77/Super-Civ-16 --state open --json number,title,labels,assignees,createdAt && gh issue list --repo danielsawitzki77/TerrorForm --state open --json number,title,labels,assignees,createdAt. Then pick the highest-priority open issue (by the priority logic in the github-issue-workflow steering doc) that belongs to a repo currently open in this workspace. If one exists, start working on it following the full workflow described in the steering doc. If no actionable issues exist, report that and stop."
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "name": "[Zeitgeist] Visual Regression Check",
+  "version": "1.0.0",
+  "description": "After completing any spec task, runs the headless visual tests to catch rendering regressions immediately.",
+  "when": {
+    "type": "postTaskExecution"
+  },
+  "then": {
+    "type": "runCommand",
+    "command": "build_test_visual.bat"
+  }
+}
