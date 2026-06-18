@@ -1,0 +1,35 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../Kiro-Tooling"
+		},
+		{
+			"path": "../picojson"
+		},
+		{
+			"path": "../SDL"
+		},
+		{
+			"path": "../SDL_image"
+		},
+		{
+			"path": "../SDL_ttf"
+		},
+		{
+			"path": "../SDL_VisualTest"
+		},
+		{
+			"path": "../Super Civ 16"
+		},
+		{
+			"path": "../TerrorForm"
+		},
+		{
+			"path": "../Zeitgeist Evolved"
+		}
+	],
+	"settings": {}
+}
