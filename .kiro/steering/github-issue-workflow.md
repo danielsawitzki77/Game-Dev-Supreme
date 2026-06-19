@@ -60,7 +60,7 @@ When checking open issues for follow-up:
 1. Fetch comments: `gh api repos/<owner>/<repo>/issues/<number>/comments --jq '.[] | {id, body, user: .user.login, reactions: .reactions}'`
 2. A comment is **human** if its body does NOT start with `🤖 [Kiro]`
 3. A comment is **unprocessed** if it has no 👀 (eyes) reaction from the bot
-4. Process unprocessed human comments as follow-up instructions, then react with 👀
+4. Process unprocessed human comments **sequentially**, posting a separate reply for each one, then react with 👀 on each after processing it.
 
 ### Target Project Deduction
 
@@ -92,6 +92,31 @@ Mapping of common keywords to repos:
 - Commit with conventional messages referencing the issue: `fix: <description> (#<number>)`
 - Push to the branch and create a PR: `gh pr create --repo <repo> --title "<title>" --body "Addresses #<number>\n\n<description of changes>"`
 - After PR creation, post a completion comment on the issue (do NOT close it)
+
+### Handling Local Changes and Merge Conflicts
+
+**Local Unstaged Changes:** Before creating a feature branch, check `git status`. If there are unstaged or uncommitted changes:
+
+1. **Unrelated changes** — `git stash` before branching, restore with `git stash pop` after switching back.
+2. **Related or uncertain changes** — incorporate into the feature branch commit if they align, or stash and note it in the comment for the human.
+3. **Never run `git reset --hard` or `git clean -f`** without explicit human permission.
+
+**Merge Conflicts:**
+
+1. **Branch from latest main** — always `git checkout main; git pull` before creating the feature branch.
+2. **Conflicts during PR** — note in the completion comment; resolve by rebasing or merging main into the feature branch.
+3. **Concurrent branch conflicts** — resolve sequentially (finish one PR, then rebase the next).
+4. **Never force-push** unless explicitly told to by a human.
+
+### Vendor Dependency Updates
+
+The `update_vendor.bat` script lives in Game-Dev-Supreme. Game projects call it via relative path:
+
+```batch
+..\Game-Dev-Supreme\update_vendor.bat
+```
+
+The script uses the caller's working directory (`%CD%`) to locate the project's `vendor\` folder and copies from sibling source repos (SDL, SDL_image, picojson, stb). Each copy has `.git` removed to avoid nested-repo warnings.
 
 ### Visual Testing (SDL Projects)
 

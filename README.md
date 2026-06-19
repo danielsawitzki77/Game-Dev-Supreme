@@ -67,6 +67,33 @@ Run `install.bat` to copy the steering doc to `~/.kiro/steering/` (needed for gl
 4. Kiro processes follow-ups → acts on human comments, marks with 👀
 5. Human approves closure → only then does Kiro close the issue
 
+## How Kiro Handles Local Changes and Merge Conflicts
+
+### Local Unstaged Changes
+
+Before creating a feature branch, Kiro checks `git status`. If there are unstaged or uncommitted changes:
+
+1. **Unrelated changes** — stashed before branching, restored after switching back.
+2. **Related or uncertain changes** — incorporated into the feature branch commit if they align, or stashed with a note for the human.
+3. **Never runs `git reset --hard` or `git clean -f`** without explicit human permission.
+
+### Merge Conflicts
+
+1. **Branches from latest main** — always `git checkout main; git pull` before creating the feature branch.
+2. **Conflicts during PR** — noted in the completion comment; resolved by rebasing or merging main into the feature branch.
+3. **Concurrent branch conflicts** — resolved sequentially (finish one PR, then rebase the next).
+4. **Never force-pushes** unless explicitly told to by a human.
+
+## Vendor Dependency Updates
+
+The `update_vendor.bat` script lives in Game-Dev-Supreme and can be called from any game project directory using a relative path:
+
+```batch
+..\Game-Dev-Supreme\update_vendor.bat
+```
+
+This updates the calling project's `vendor\` folder from sibling source repos (SDL, SDL_image, picojson, stb). The script auto-detects the calling directory and operates on its vendor folder.
+
 ## Note on Kiro-Tooling
 
 The `Kiro-Tooling` repository is deprecated. All tooling configuration now lives here in Game-Dev-Supreme.
