@@ -4,9 +4,6 @@
 			"path": "."
 		},
 		{
-			"path": "../Kiro-Tooling"
-		},
-		{
 			"path": "../picojson"
 		},
 		{
