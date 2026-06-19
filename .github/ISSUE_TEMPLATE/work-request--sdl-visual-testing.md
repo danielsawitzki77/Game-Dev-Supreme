@@ -1,7 +1,7 @@
 ---
 name: 'Work request: SDL Visual Testing'
 about: Do a change in repo SDL_VisualTest
-title: Work request for SDL Visual Test
+title: 'Work request for SDL Visual Test: '
 labels: ''
 assignees: danielsawitzki77
 
