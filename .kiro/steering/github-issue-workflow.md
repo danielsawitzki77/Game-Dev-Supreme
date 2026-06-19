@@ -79,6 +79,20 @@ Mapping of common keywords to repos:
 - "terrorform", "terraform" → `TerrorForm`
 - "game dev supreme", "issue checker", "hooks", "polling", "batch file" → `Game-Dev-Supreme`
 
+### Local Path Mapping
+
+GitHub repo names do NOT always match local folder names. **Never clone a repo if a folder for it already exists** — use this mapping to find the correct local path:
+
+| GitHub Repo Slug | Local Folder Name | Full Local Path |
+|---|---|---|
+| `Zeitgeist-Evolved` | `Zeitgeist Evolved` | `c:\Users\Daniel Sawitzki\Desktop\github\Zeitgeist Evolved` |
+| `SDL_VisualTest` | `SDL_VisualTest` | `c:\Users\Daniel Sawitzki\Desktop\github\SDL_VisualTest` |
+| `Super-Civ-16` | `Super Civ 16` | `c:\Users\Daniel Sawitzki\Desktop\github\Super Civ 16` |
+| `TerrorForm` | `TerrorForm` | `c:\Users\Daniel Sawitzki\Desktop\github\TerrorForm` |
+| `Game-Dev-Supreme` | `Game-Dev-Supreme` | `c:\Users\Daniel Sawitzki\Desktop\github\Game-Dev-Supreme` |
+
+**Critical rule:** When determining if a repo is "available in the workspace", check this mapping table — do NOT rely on the GitHub repo slug matching a folder name exactly. A mismatch (e.g., hyphen vs space) does not mean the repo is missing. If the mapped local path exists, use it. Never `git clone` a repo that already has a local folder listed here.
+
 ### Scope Rules
 
 - Only work on repos whose workspace folder exists under `c:\Users\Daniel Sawitzki\Desktop\github`
