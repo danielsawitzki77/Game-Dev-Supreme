@@ -42,7 +42,10 @@ Game-Dev-Supreme.code-workspace  # Multi-root VS Code workspace
 
 ### Headless Polling (AFK mode)
 
-Run `check-issues-loop.bat` to poll every 60 seconds and work issues autonomously.
+Run `check-issues-loop.bat` to poll and work issues autonomously. The script never terminates — it keeps polling even when no work is found. Polling frequency adapts to time of day:
+
+- **Active hours (8am–10pm PST):** every 3 minutes
+- **Quiet hours (10pm–8am PST):** every 30 minutes
 
 #### Prerequisites
 
