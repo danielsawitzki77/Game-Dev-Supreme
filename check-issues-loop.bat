@@ -1,4 +1,11 @@
 @echo off
+REM If running under PowerShell, re-launch under cmd.exe
+if defined PSModulePath if not defined __CMD_RELAUNCH (
+    set "__CMD_RELAUNCH=1"
+    cmd /c "%~f0" %*
+    exit /b %errorlevel%
+)
+set "__CMD_RELAUNCH="
 REM ============================================================
 REM Kiro CLI - Periodic GitHub Issue Checker
 REM Runs headless, checks all monitored repos indefinitely,
