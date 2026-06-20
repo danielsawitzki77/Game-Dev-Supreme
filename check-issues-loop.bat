@@ -58,7 +58,7 @@ if %HOUR% LSS 8 set INTERVAL_SEC=%INTERVAL_QUIET%
 
 REM --- Cleanup stale local branches across all repos ---
 call :cleanup_branches "c:\Users\Daniel Sawitzki\Desktop\github\Game-Dev-Supreme"
-call :cleanup_branches "c:\Users\Daniel Sawitzki\Desktop\github\Zeitgeist-Evolved"
+call :cleanup_branches "c:\Users\Daniel Sawitzki\Desktop\github\Zeitgeist Evolved"
 call :cleanup_branches "c:\Users\Daniel Sawitzki\Desktop\github\SDL_VisualTest"
 call :cleanup_branches "c:\Users\Daniel Sawitzki\Desktop\github\Super Civ 16"
 call :cleanup_branches "c:\Users\Daniel Sawitzki\Desktop\github\TerrorForm"

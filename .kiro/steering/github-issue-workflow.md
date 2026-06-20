@@ -161,6 +161,17 @@ After finishing work on one issue, **immediately check for the next issue** acro
 
 Continue working until no more actionable items remain.
 
+### Stale Branch Cleanup
+
+At the start of each issue-checking cycle, prune stale local branches across all repos:
+
+1. For each repo in the local path mapping:
+   - Run `git fetch --prune` to remove stale remote tracking refs
+   - Delete local branches whose upstream is marked `gone` (PR was merged and remote branch deleted): `git branch -d <branch>`
+   - Never delete `main`, `master`, or the currently checked-out branch
+   - Use `-d` (safe delete) — if the branch isn't fully merged locally (e.g., squash merges), use `-D` only when the remote tracking branch is confirmed gone
+2. This prevents accumulation of stale feature branches from completed PRs
+
 ## Command Reference
 
 ```bash
