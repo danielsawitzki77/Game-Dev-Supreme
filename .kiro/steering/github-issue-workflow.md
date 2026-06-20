@@ -62,6 +62,17 @@ When checking open issues for follow-up:
 3. A comment is **unprocessed** if it has no 👀 (eyes) reaction from the bot
 4. Process unprocessed human comments **sequentially**, posting a separate reply for each one, then react with 👀 on each after processing it.
 
+### Processing Screenshots and Images
+
+Issue bodies and comments often contain screenshots (embedded as `<img>` tags or `![alt](url)` markdown). These images provide critical context — bug reproductions, UI state, error dialogs, etc.
+
+When reading an issue body or comment:
+
+1. **Identify all image URLs** — look for `<img ... src="...">` tags and `![...](...)` markdown image syntax.
+2. **Download and analyze each image** — use the image reading capability to view the screenshot content. Images hosted on `github.com/user-attachments/assets/` or `githubusercontent.com` are GitHub-hosted and safe to fetch.
+3. **Use image content as context** — screenshots may show error messages, UI state, file listings, or other information that the text alone doesn't convey. Factor this into your understanding of the issue or follow-up request.
+4. **Reference what you see** — when replying to a comment with a screenshot, acknowledge what the image shows so the human knows it was processed.
+
 ### Target Project Deduction
 
 An issue may be filed in one repo but describe changes that belong to a different repo. Before starting work, **deduce the correct target project** from the issue title and body:
