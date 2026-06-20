@@ -3,3 +3,5 @@
 NO_WORK
 no_work.flag
 kiro_no_work.tmp
+
+__pycache__/
