@@ -16,6 +16,10 @@ The following repos are monitored for issues:
 
 ## Issue Pickup Logic
 
+### Exclusion Filter
+
+- **Skip issues with the `Draft` label.** These are not ready for automated pickup. Do not assign, comment, or work on them. Treat them as invisible during issue scanning.
+
 ### Priority Order
 
 1. Issues with `priority: critical` or `priority: high` labels
