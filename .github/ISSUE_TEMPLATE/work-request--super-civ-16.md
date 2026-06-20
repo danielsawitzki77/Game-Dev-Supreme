@@ -7,6 +7,12 @@ assignees: danielsawitzki77
 
 ---
 
-We need a change or fix or improvement to be made in repository Super-Civ-16. Prepare to make changes primarily in this repo, but if it involved changes to the SDL Visual Testing solution as well, then separate those cleanly from the ones that are specific to Super Civ 16. Make separate PRs for both Visual Testing in this repo and Super Civ 16, for only things that are specific to Super Civ 16 - if there need to be changes done in Visual Testing at all. Make sure to run comprehensive full application tests running the game at least 64 times with various branching traversals and random seeds and compare them to the expected outcomes and generate a consolidated report on the outcomes in md and attach it to this issues as a link in the resulting comment.
+We need a change or fix or improvement to be made in repository Super-Civ-16. Prepare to make changes primarily in this repo. If changes to SDL_VisualTest are also required, make a separate PR in that repo for the visual-testing-specific parts.
+
+**Visual Testing & Verification:**
+- Run the integration test suite (at least 64 runs with varied seeds/traversals), generate a consolidated MD report, and attach it to this issue.
+- Use SDL_VisualTest_GifRecorder to capture an animated GIF of the user path through the game that exercises the changes made. Show interactions in real-time (not sped up) with the virtual cursor overlay enabled.
+- Attach the GIF to the PR description and to work-progress comments on this issue.
+- If this work creates or modifies any spec documents, archive the GIF alongside the spec (same directory, matching filename with `.gif` extension).
 
 Here comes the actual ask of what needs to be done/fixed/extended:
