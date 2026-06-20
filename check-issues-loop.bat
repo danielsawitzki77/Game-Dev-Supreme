@@ -56,6 +56,13 @@ REM Quiet hours: 22:00 (10pm) through 07:59 (8am)
 if %HOUR% GEQ 22 set INTERVAL_SEC=%INTERVAL_QUIET%
 if %HOUR% LSS 8 set INTERVAL_SEC=%INTERVAL_QUIET%
 
+REM --- Cleanup stale local branches across all repos ---
+call :cleanup_branches "c:\Users\Daniel Sawitzki\Desktop\github\Game-Dev-Supreme"
+call :cleanup_branches "c:\Users\Daniel Sawitzki\Desktop\github\Zeitgeist-Evolved"
+call :cleanup_branches "c:\Users\Daniel Sawitzki\Desktop\github\SDL_VisualTest"
+call :cleanup_branches "c:\Users\Daniel Sawitzki\Desktop\github\Super Civ 16"
+call :cleanup_branches "c:\Users\Daniel Sawitzki\Desktop\github\TerrorForm"
+
 echo [%date% %time%] Checking for open issues (interval: %INTERVAL_SEC%s)...
 echo.
 
@@ -79,3 +86,44 @@ if exist "%MARKER_FILE%" (
     echo.
 )
 goto loop
+
+REM ============================================================
+REM Subroutine: cleanup_branches
+REM Prunes remote tracking refs and deletes local branches
+REM whose upstream is gone (already merged/deleted on remote),
+REM as well as local-only branches with no upstream that are
+REM already merged into main. Never deletes main/master or
+REM the currently checked-out branch. Uses -d (safe delete)
+REM which only works if the branch is fully merged.
+REM ============================================================
+:cleanup_branches
+set "REPO_PATH=%~1"
+if not exist "%REPO_PATH%\.git" goto :eof
+
+pushd "%REPO_PATH%"
+echo [Cleanup] %REPO_PATH%
+
+REM Fetch and prune stale remote tracking branches
+git fetch --prune >nul 2>&1
+
+REM Delete local branches whose upstream is gone (merged PRs, deleted remotes)
+for /f "tokens=1" %%b in ('git branch -vv 2^>nul ^| findstr ": gone]"') do (
+    if /i not "%%b"=="main" if /i not "%%b"=="master" if not "%%b"=="*" (
+        echo   Deleting stale branch: %%b
+        git branch -d "%%b" >nul 2>&1
+        if errorlevel 1 (
+            echo   [skipped - not fully merged: %%b]
+        )
+    )
+)
+
+REM Delete local branches that were never published (no upstream) and are merged into main
+for /f "tokens=1" %%b in ('git branch --merged main 2^>nul') do (
+    if /i not "%%b"=="main" if /i not "%%b"=="master" if not "%%b"=="*" (
+        echo   Deleting merged local branch: %%b
+        git branch -d "%%b" >nul 2>&1
+    )
+)
+
+popd
+goto :eof
