@@ -111,14 +111,22 @@ GitHub repo names do NOT always match local folder names. **Never clone a repo i
 - If the highest-priority issue is in a repo not available on disk, skip it and note that in a comment: "🤖 [Kiro] Cannot work on this — repo not available in current workspace. Skipping to next issue."
 - If no issues are workable (all in unavailable repos), report that and stop
 
+### Cross-Repo References
+
+**Critical:** GitHub interprets `#<number>` relative to the repo where the comment or PR lives. When working across repos, ALWAYS use fully-qualified references: `danielsawitzki77/<repo>#<number>`.
+
+- **In PR bodies** (target repo): Reference the source issue as `danielsawitzki77/<issue-repo>#<number>` (e.g., `Addresses danielsawitzki77/Game-Dev-Supreme#32`)
+- **In issue comments** (issue repo): Reference PRs with full URLs: `https://github.com/danielsawitzki77/<pr-repo>/pull/<pr-number>`
+- **Never use bare `#<number>`** unless the reference is within the same repo where you're posting
+
 ### Work Execution
 
 - Follow existing project conventions (steering docs, build systems, etc.)
 - Create a feature branch for the work: `git checkout -b issue-<number>-<short-description>`
-- Commit with conventional messages referencing the issue: `fix: <description> (#<number>)`
-- Push to the branch and create a PR: `gh pr create --repo <repo> --title "<title>" --body "Addresses #<number>\n\n<description of changes>"`
-- Assign the PR to the issue's assignees: `gh pr edit <pr-number> --repo <repo> --add-assignee <assignee1>,<assignee2>`
-- After PR creation, post a completion comment on the issue (do NOT close it)
+- Commit with conventional messages referencing the issue: `fix: <description> (danielsawitzki77/<issue-repo>#<number>)`
+- Push to the branch and create a PR: `gh pr create --repo <target-repo> --title "<title>" --body "Addresses danielsawitzki77/<issue-repo>#<number>\n\n<description of changes>"`
+- Assign the PR to the issue's assignees: `gh pr edit <pr-number> --repo <target-repo> --add-assignee <assignee1>,<assignee2>`
+- After PR creation, post a completion comment on the issue with the full PR URL (do NOT close it)
 
 ### Handling Local Changes and Merge Conflicts
 
