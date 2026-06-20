@@ -17,6 +17,8 @@ header .count { color: #888; font-size: 0.9rem; }
 .controls button:hover { background: #c73e54; }
 .controls button.secondary { background: #0f3460; border: 1px solid #333; }
 .controls button.secondary:hover { background: #1a4a8a; }
+.controls button.secondary.delete { color: #e94560; border-color: #e94560; }
+.controls button.secondary.delete:hover { background: #e94560; color: #fff; }
 main { display: flex; height: calc(100vh - 130px); }
 .list-panel { width: 400px; overflow-y: auto; border-right: 1px solid #0f3460; }
 .report-item { padding: 0.75rem 1rem; border-bottom: 1px solid #0f3460; cursor: pointer; transition: background 0.15s; }
@@ -66,6 +68,7 @@ main { display: flex; height: calc(100vh - 130px); }
   </select>
   <input type="text" id="filter-search" placeholder="Search reports...">
   <button class="secondary" onclick="loadReports()">↻ Refresh</button>
+  <button class="secondary delete" onclick="deleteFiltered()">🗑 Delete Filtered</button>
 </div>
 <main>
   <div class="list-panel" id="list"></div>
@@ -136,6 +139,18 @@ async function deleteReport(path) {
     activeReport = null;
     document.getElementById('content').innerHTML = '<div class="empty-state">Report deleted</div>';
   }
+}
+
+async function deleteFiltered() {
+  const filtered = getFiltered();
+  if (!filtered.length) return;
+  if (!confirm(`Delete ${filtered.length} report(s) matching current filters?`)) return;
+  for (const r of filtered) {
+    await fetch('/api/delete-report', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({path: r.path}) });
+  }
+  activeReport = null;
+  document.getElementById('content').innerHTML = '<div class="empty-state">Reports deleted</div>';
+  loadReports();
 }
 
 function renderMarkdown(md) {
