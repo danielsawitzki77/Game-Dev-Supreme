@@ -117,6 +117,7 @@ GitHub repo names do NOT always match local folder names. **Never clone a repo i
 - Create a feature branch for the work: `git checkout -b issue-<number>-<short-description>`
 - Commit with conventional messages referencing the issue: `fix: <description> (#<number>)`
 - Push to the branch and create a PR: `gh pr create --repo <repo> --title "<title>" --body "Addresses #<number>\n\n<description of changes>"`
+- Assign the PR to the issue's assignees: `gh pr edit <pr-number> --repo <repo> --add-assignee <assignee1>,<assignee2>`
 - After PR creation, post a completion comment on the issue (do NOT close it)
 
 ### Handling Local Changes and Merge Conflicts
@@ -190,6 +191,9 @@ gh issue edit <number> --repo <owner/repo> --add-assignee danielsawitzki77
 
 # Create a PR
 gh pr create --repo <owner/repo> --title "<title>" --body "<body>" --head <branch>
+
+# Assign PR to issue assignees
+gh pr edit <pr-number> --repo <owner/repo> --add-assignee <assignee1>,<assignee2>
 ```
 
 ## Important Notes
