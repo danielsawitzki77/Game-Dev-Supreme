@@ -29,9 +29,10 @@ The following repos are monitored for issues:
 When picking up an issue:
 
 1. **Assign it** to `danielsawitzki77` if not already assigned: `gh issue edit <number> --repo <repo> --add-assignee danielsawitzki77`
-2. **Post a comment** indicating work has started: `gh issue comment <number> --repo <repo> --body "🤖 [Kiro] Picking up this issue and starting work."`
-3. **Read the full issue body** to understand the task
-4. **Fill in missing fields** by common sense (labels, milestone if obvious)
+2. **React with 👀** on the issue itself to signal it's being worked on: `gh api repos/<owner>/<repo>/issues/<number>/reactions -f content=eyes`
+3. **Post a comment** indicating work has started: `gh issue comment <number> --repo <repo> --body "🤖 [Kiro] Picking up this issue and starting work."`
+4. **Read the full issue body** to understand the task
+5. **Fill in missing fields** by common sense (labels, milestone if obvious)
 
 ## Working on an Issue
 
