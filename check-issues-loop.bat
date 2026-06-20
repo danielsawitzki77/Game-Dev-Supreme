@@ -1,11 +1,4 @@
 @echo off
-REM If running under PowerShell, re-launch under cmd.exe
-if defined PSModulePath if not defined __CMD_RELAUNCH (
-    set "__CMD_RELAUNCH=1"
-    cmd /c "%~f0" %*
-    exit /b %errorlevel%
-)
-set "__CMD_RELAUNCH="
 REM ============================================================
 REM Kiro CLI - Periodic GitHub Issue Checker
 REM Runs headless, checks all monitored repos indefinitely,
@@ -86,8 +79,8 @@ REM Check if Kiro found no work — if marker exists, wait; otherwise re-run imm
 if exist "%MARKER_FILE%" (
     echo ============================================================
     echo  Kiro Issue Worker - Adaptive Polling
-    echo  Active hours (8am-10pm PST): every %INTERVAL_ACTIVE%s
-    echo  Quiet hours (10pm-8am PST):  every %INTERVAL_QUIET%s
+    echo  Active hours ^(8am-10pm PST^): every %INTERVAL_ACTIVE%s
+    echo  Quiet hours ^(10pm-8am PST^):  every %INTERVAL_QUIET%s
     echo  Press any key during countdown to check immediately
     echo  Working directory: %WORK_DIR%
     echo  Press Ctrl+C to stop
