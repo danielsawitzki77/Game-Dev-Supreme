@@ -77,7 +77,7 @@ if errorlevel 1 goto :error
 if exist "%VENDOR_DIR%\picojson\.git" rmdir /s /q "%VENDOR_DIR%\picojson\.git"
 echo       Done.
 
-REM --- stb ---
+REM --- stb (sparse: only needed headers) ---
 echo [4/4] Updating stb...
 if not exist "%PARENT_DIR%\stb" (
     echo ERROR: Source repo not found at %PARENT_DIR%\stb
@@ -87,14 +87,35 @@ if exist "%VENDOR_DIR%\stb" (
     echo       Removing old copy...
     rmdir /s /q "%VENDOR_DIR%\stb"
 )
-echo       Copying from %PARENT_DIR%\stb ...
-xcopy "%PARENT_DIR%\stb" "%VENDOR_DIR%\stb\" /E /I /Q /H /Y >nul
+mkdir "%VENDOR_DIR%\stb"
+echo       Copying selected headers from %PARENT_DIR%\stb ...
+copy /y "%PARENT_DIR%\stb\stb_truetype.h" "%VENDOR_DIR%\stb\" >nul
 if errorlevel 1 goto :error
-if exist "%VENDOR_DIR%\stb\.git" rmdir /s /q "%VENDOR_DIR%\stb\.git"
+copy /y "%PARENT_DIR%\stb\stb_rect_pack.h" "%VENDOR_DIR%\stb\" >nul
+if errorlevel 1 goto :error
+copy /y "%PARENT_DIR%\stb\stb_image.h" "%VENDOR_DIR%\stb\" >nul
+if errorlevel 1 goto :error
+copy /y "%PARENT_DIR%\stb\stb_image_write.h" "%VENDOR_DIR%\stb\" >nul
+if errorlevel 1 goto :error
 echo       Done.
 
 echo.
 echo === All vendor dependencies updated successfully ===
+
+REM --- Apply project-specific patches (overlay) ---
+REM If the calling project has a vendor_patches\ folder, copy its contents
+REM on top of vendor\ to restore custom files (e.g. static lib .vcxproj).
+if exist "%PROJECT_DIR%\vendor_patches" (
+    echo.
+    echo --- Applying vendor patches from vendor_patches\ ---
+    xcopy "%PROJECT_DIR%\vendor_patches" "%VENDOR_DIR%\" /E /I /Q /H /Y >nul
+    if errorlevel 1 (
+        echo WARNING: Some patches failed to apply.
+    ) else (
+        echo    Done.
+    )
+)
+
 echo.
 goto :end
 
