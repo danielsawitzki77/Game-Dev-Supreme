@@ -70,6 +70,15 @@ echo [%date% %time%] Cycle complete.
 
 REM Check if Kiro found no work — if marker exists, wait; otherwise re-run immediately
 if exist "%MARKER_FILE%" (
+    echo ============================================================
+    echo  Kiro Issue Worker - Adaptive Polling
+    echo  Active hours (8am-10pm PST): every %INTERVAL_ACTIVE%s
+    echo  Quiet hours (10pm-8am PST):  every %INTERVAL_QUIET%s
+    echo  Press any key during countdown to check immediately
+    echo  Working directory: %WORK_DIR%
+    echo  Press Ctrl+C to stop
+    echo ============================================================
+    echo.
     echo No actionable issues found. Waiting %INTERVAL_SEC% seconds...
     echo Press any key to check immediately.
     echo.
