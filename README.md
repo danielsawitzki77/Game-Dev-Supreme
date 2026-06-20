@@ -44,8 +44,10 @@ Game-Dev-Supreme.code-workspace  # Multi-root VS Code workspace
 
 Run `check-issues-loop.bat` to poll and work issues autonomously. The script never terminates — it keeps polling even when no work is found. Polling frequency adapts to time of day:
 
-- **Active hours (8am–10pm PST):** every 3 minutes
+- **Active hours (8am–10pm PST):** every 10 minutes
 - **Quiet hours (10pm–8am PST):** every 30 minutes
+
+During the countdown, press any key to force an immediate check. If Kiro found and worked on an issue, the next check runs immediately without waiting.
 
 #### Prerequisites
 
