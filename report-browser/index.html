@@ -10,7 +10,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 header { background: #16213e; padding: 1rem 2rem; border-bottom: 1px solid #0f3460; display: flex; align-items: center; gap: 1rem; }
 header h1 { font-size: 1.4rem; color: #e94560; }
 header .count { color: #888; font-size: 0.9rem; }
-.controls { display: flex; gap: 0.5rem; padding: 1rem 2rem; background: #16213e; border-bottom: 1px solid #0f3460; flex-wrap: wrap; }
+.controls { display: flex; gap: 0.5rem; padding: 1rem 2rem; background: #16213e; border-bottom: 1px solid #0f3460; flex-wrap: wrap; align-items: center; }
 .controls select, .controls input { background: #0f3460; color: #eee; border: 1px solid #333; padding: 0.4rem 0.8rem; border-radius: 4px; font-size: 0.85rem; }
 .controls input { width: 200px; }
 .controls button { background: #e94560; color: #fff; border: none; padding: 0.4rem 1rem; border-radius: 4px; cursor: pointer; font-size: 0.85rem; }
@@ -19,6 +19,9 @@ header .count { color: #888; font-size: 0.9rem; }
 .controls button.secondary:hover { background: #1a4a8a; }
 .controls button.secondary.delete { color: #e94560; border-color: #e94560; }
 .controls button.secondary.delete:hover { background: #e94560; color: #fff; }
+.controls .spacer { flex: 1; }
+.controls button.quit { background: #555; color: #ccc; border: 1px solid #777; }
+.controls button.quit:hover { background: #e94560; color: #fff; border-color: #e94560; }
 main { display: flex; height: calc(100vh - 130px); }
 .list-panel { width: 400px; overflow-y: auto; border-right: 1px solid #0f3460; }
 .report-item { padding: 0.75rem 1rem; border-bottom: 1px solid #0f3460; cursor: pointer; transition: background 0.15s; }
@@ -33,18 +36,25 @@ main { display: flex; height: calc(100vh - 130px); }
 .report-item .type-badge.screenshots { color: #6c63ff; border: 1px solid #6c63ff; }
 .report-item .type-badge.general { color: #888; border: 1px solid #555; }
 .content-panel { flex: 1; overflow-y: auto; padding: 2rem; }
-.content-panel pre { white-space: pre-wrap; word-wrap: break-word; font-family: 'Cascadia Code', 'Fira Code', monospace; font-size: 0.85rem; line-height: 1.6; }
 .content-panel .rendered { line-height: 1.7; }
-.content-panel .rendered h1 { font-size: 1.5rem; color: #e94560; margin: 1rem 0 0.5rem; }
+.content-panel .rendered h1 { font-size: 1.5rem; color: #e94560; margin: 1.2rem 0 0.5rem; }
 .content-panel .rendered h2 { font-size: 1.2rem; color: #4ecdc4; margin: 1rem 0 0.5rem; }
 .content-panel .rendered h3 { font-size: 1rem; color: #ffd93d; margin: 0.8rem 0 0.3rem; }
 .content-panel .rendered p { margin: 0.5rem 0; }
 .content-panel .rendered code { background: #0f3460; padding: 0.1rem 0.3rem; border-radius: 3px; font-size: 0.85rem; }
-.content-panel .rendered pre { background: #0f3460; padding: 1rem; border-radius: 6px; margin: 0.5rem 0; }
+.content-panel .rendered pre { background: #0f3460; padding: 1rem; border-radius: 6px; margin: 0.5rem 0; overflow-x: auto; }
+.content-panel .rendered pre code { background: none; padding: 0; }
 .content-panel .rendered table { border-collapse: collapse; margin: 0.5rem 0; width: 100%; }
 .content-panel .rendered th, .content-panel .rendered td { border: 1px solid #333; padding: 0.4rem 0.6rem; text-align: left; }
-.content-panel .rendered th { background: #0f3460; }
+.content-panel .rendered th { background: #0f3460; font-weight: 600; }
 .content-panel .rendered img { max-width: 100%; border-radius: 4px; margin: 0.5rem 0; }
+.content-panel .rendered a { color: #4ecdc4; text-decoration: none; }
+.content-panel .rendered a:hover { text-decoration: underline; }
+.content-panel .rendered hr { border: none; border-top: 1px solid #333; margin: 1rem 0; }
+.content-panel .rendered ul, .content-panel .rendered ol { margin: 0.5rem 0 0.5rem 1.5rem; }
+.content-panel .rendered li { margin: 0.2rem 0; }
+.content-panel .rendered blockquote { border-left: 3px solid #4ecdc4; padding-left: 1rem; color: #aaa; margin: 0.5rem 0; }
+.content-panel .rendered strong { color: #fff; }
 .empty-state { display: flex; align-items: center; justify-content: center; height: 100%; color: #555; font-size: 1.1rem; }
 .actions { display: flex; gap: 0.5rem; margin-top: 0.4rem; }
 .actions button { font-size: 0.7rem; padding: 0.2rem 0.5rem; background: #333; border: 1px solid #555; color: #aaa; border-radius: 3px; cursor: pointer; }
@@ -69,6 +79,8 @@ main { display: flex; height: calc(100vh - 130px); }
   <input type="text" id="filter-search" placeholder="Search reports...">
   <button class="secondary" onclick="loadReports()">↻ Refresh</button>
   <button class="secondary delete" onclick="deleteFiltered()">🗑 Delete Filtered</button>
+  <span class="spacer"></span>
+  <button class="quit" onclick="quitServer()">⏹ Quit Server</button>
 </div>
 <main>
   <div class="list-panel" id="list"></div>
@@ -77,6 +89,7 @@ main { display: flex; height: calc(100vh - 130px); }
 <script>
 let allReports = [];
 let activeReport = null;
+let activeReportDir = null; // directory of the active report (for resolving relative image paths)
 
 async function loadReports() {
   const res = await fetch('/api/reports');
@@ -107,16 +120,16 @@ function renderList() {
   const filtered = getFiltered();
   document.getElementById('count').textContent = `${filtered.length} of ${allReports.length} reports`;
   const html = filtered.map(r => `
-    <div class="report-item ${activeReport === r.path ? 'active' : ''}" onclick="viewReport('${r.path.replace(/\\/g, '\\\\')}')">
-      <div class="project">${r.project}</div>
-      <div class="name">${r.dir === '.' ? r.name : r.dir + '/' + r.name}</div>
+    <div class="report-item ${activeReport === r.path ? 'active' : ''}" onclick="viewReport('${escapeJs(r.path)}')">
+      <div class="project">${esc(r.project)}</div>
+      <div class="name">${esc(r.dir === '.' ? r.name : r.dir + '/' + r.name)}</div>
       <div class="meta">
-        <span class="type-badge ${r.type}">${r.type}</span>
+        <span class="type-badge ${r.type}">${esc(r.type)}</span>
         <span>${formatSize(r.size)}</span>
         <span>${formatDate(r.modified)}</span>
       </div>
       <div class="actions">
-        <button onclick="event.stopPropagation(); deleteReport('${r.path.replace(/\\/g, '\\\\')}');" class="delete">🗑 Delete</button>
+        <button onclick="event.stopPropagation(); deleteReport('${escapeJs(r.path)}');" class="delete">🗑 Delete</button>
       </div>
     </div>
   `).join('');
@@ -125,6 +138,10 @@ function renderList() {
 
 async function viewReport(path) {
   activeReport = path;
+  // Compute the directory of the report file for resolving relative paths
+  const parts = path.replace(/\\/g, '/').split('/');
+  parts.pop(); // remove filename
+  activeReportDir = parts.join('/');
   renderList();
   const res = await fetch(`/api/report-content?path=${encodeURIComponent(path)}`);
   const text = await res.text();
@@ -153,21 +170,231 @@ async function deleteFiltered() {
   loadReports();
 }
 
+async function quitServer() {
+  if (!confirm('Shut down the report browser server?')) return;
+  try { await fetch('/api/shutdown'); } catch(e) {}
+  document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;color:#888;font-size:1.2rem;">Server stopped. You can close this tab.</div>';
+}
+
+/**
+ * Proper Markdown-to-HTML renderer.
+ * Handles: headers, bold, italic, code blocks, inline code, tables,
+ * images (with relative path resolution), links, lists, blockquotes, hrs.
+ */
 function renderMarkdown(md) {
-  return md
-    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
-    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
-    .replace(/^# (.+)$/gm, '<h1>$1</h1>')
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/`([^`]+)`/g, '<code>$1</code>')
-    .replace(/^\| (.+)$/gm, (m) => {
-      const cells = m.split('|').filter(c => c.trim()).map(c => `<td>${c.trim()}</td>`).join('');
-      return `<tr>${cells}</tr>`;
-    })
-    .replace(/^---+$/gm, '<hr>')
-    .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img alt="$1" src="$2">')
-    .replace(/\n/g, '<br>');
+  // Normalize line endings
+  md = md.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+
+  let html = '';
+  const lines = md.split('\n');
+  let i = 0;
+
+  while (i < lines.length) {
+    const line = lines[i];
+
+    // Fenced code block
+    if (line.match(/^```/)) {
+      let code = '';
+      i++;
+      while (i < lines.length && !lines[i].match(/^```/)) {
+        code += esc(lines[i]) + '\n';
+        i++;
+      }
+      i++; // skip closing ```
+      html += `<pre><code>${code}</code></pre>`;
+      continue;
+    }
+
+    // Table detection: line with pipes and next line is separator
+    if (line.includes('|') && i + 1 < lines.length && lines[i + 1].match(/^\|?\s*[-:]+[-|:\s]*$/)) {
+      html += renderTable(lines, i);
+      // Skip past table
+      i++;  // header
+      i++;  // separator
+      while (i < lines.length && lines[i].includes('|') && lines[i].trim() !== '') {
+        i++;
+      }
+      continue;
+    }
+
+    // Heading
+    const headingMatch = line.match(/^(#{1,6})\s+(.+)$/);
+    if (headingMatch) {
+      const level = headingMatch[1].length;
+      html += `<h${level}>${inline(headingMatch[2])}</h${level}>`;
+      i++;
+      continue;
+    }
+
+    // Horizontal rule
+    if (line.match(/^(-{3,}|\*{3,}|_{3,})\s*$/)) {
+      html += '<hr>';
+      i++;
+      continue;
+    }
+
+    // Blockquote
+    if (line.match(/^>\s?/)) {
+      let bq = '';
+      while (i < lines.length && lines[i].match(/^>\s?/)) {
+        bq += lines[i].replace(/^>\s?/, '') + '\n';
+        i++;
+      }
+      html += `<blockquote>${inline(bq.trim())}</blockquote>`;
+      continue;
+    }
+
+    // Unordered list
+    if (line.match(/^[\s]*[-*+]\s/)) {
+      html += '<ul>';
+      while (i < lines.length && lines[i].match(/^[\s]*[-*+]\s/)) {
+        html += `<li>${inline(lines[i].replace(/^[\s]*[-*+]\s/, ''))}</li>`;
+        i++;
+      }
+      html += '</ul>';
+      continue;
+    }
+
+    // Ordered list
+    if (line.match(/^[\s]*\d+\.\s/)) {
+      html += '<ol>';
+      while (i < lines.length && lines[i].match(/^[\s]*\d+\.\s/)) {
+        html += `<li>${inline(lines[i].replace(/^[\s]*\d+\.\s/, ''))}</li>`;
+        i++;
+      }
+      html += '</ol>';
+      continue;
+    }
+
+    // Empty line
+    if (line.trim() === '') {
+      i++;
+      continue;
+    }
+
+    // Paragraph
+    let para = '';
+    while (i < lines.length && lines[i].trim() !== '' && !lines[i].match(/^#{1,6}\s/) && !lines[i].match(/^```/) && !lines[i].match(/^(-{3,}|\*{3,}|_{3,})\s*$/) && !lines[i].match(/^>\s?/)) {
+      para += (para ? ' ' : '') + lines[i];
+      i++;
+    }
+    html += `<p>${inline(para)}</p>`;
+  }
+
+  return html;
+}
+
+function renderTable(lines, startIdx) {
+  const headerLine = lines[startIdx];
+  const sepLine = lines[startIdx + 1];
+
+  const headerCells = splitTableRow(headerLine);
+  // Determine alignment from separator
+  const sepCells = splitTableRow(sepLine);
+  const aligns = sepCells.map(c => {
+    c = c.trim();
+    if (c.startsWith(':') && c.endsWith(':')) return 'center';
+    if (c.endsWith(':')) return 'right';
+    return 'left';
+  });
+
+  let tableHtml = '<table><thead><tr>';
+  headerCells.forEach((cell, idx) => {
+    const align = aligns[idx] || 'left';
+    tableHtml += `<th style="text-align:${align}">${inline(cell.trim())}</th>`;
+  });
+  tableHtml += '</tr></thead><tbody>';
+
+  let i = startIdx + 2;
+  while (i < lines.length && lines[i].includes('|') && lines[i].trim() !== '') {
+    const cells = splitTableRow(lines[i]);
+    tableHtml += '<tr>';
+    cells.forEach((cell, idx) => {
+      const align = aligns[idx] || 'left';
+      tableHtml += `<td style="text-align:${align}">${inline(cell.trim())}</td>`;
+    });
+    tableHtml += '</tr>';
+    i++;
+  }
+  tableHtml += '</tbody></table>';
+  return tableHtml;
+}
+
+function splitTableRow(line) {
+  // Remove leading/trailing pipe and split by pipe
+  line = line.trim();
+  if (line.startsWith('|')) line = line.slice(1);
+  if (line.endsWith('|')) line = line.slice(0, -1);
+  return line.split('|');
+}
+
+/**
+ * Process inline markdown: bold, italic, code, images, links
+ */
+function inline(text) {
+  if (!text) return '';
+  // Escape HTML entities
+  text = esc(text);
+
+  // Inline code (must come before other processing to avoid conflicts)
+  text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
+
+  // Images: ![alt](src) — resolve relative paths through /api/file/
+  text = text.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (match, alt, src) => {
+    const resolvedSrc = resolveImagePath(src);
+    return `<img alt="${alt}" src="${resolvedSrc}" loading="lazy">`;
+  });
+
+  // Links: [text](url)
+  text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
+
+  // Bold
+  text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  text = text.replace(/__(.+?)__/g, '<strong>$1</strong>');
+
+  // Italic
+  text = text.replace(/\*(.+?)\*/g, '<em>$1</em>');
+  text = text.replace(/_(.+?)_/g, '<em>$1</em>');
+
+  // Strikethrough
+  text = text.replace(/~~(.+?)~~/g, '<del>$1</del>');
+
+  return text;
+}
+
+/**
+ * Resolve image paths. If the path is relative, resolve it against
+ * the directory of the currently viewed report, then serve via /api/file/.
+ * If already absolute URL, leave as-is.
+ */
+function resolveImagePath(src) {
+  // Already a full URL
+  if (src.startsWith('http://') || src.startsWith('https://') || src.startsWith('data:')) {
+    return src;
+  }
+  // Resolve relative to report directory
+  if (activeReportDir) {
+    const dirParts = activeReportDir.split('/');
+    const srcParts = src.replace(/\\/g, '/').split('/');
+    // Handle ../ in relative path
+    const resolved = [...dirParts];
+    for (const part of srcParts) {
+      if (part === '..') resolved.pop();
+      else if (part !== '.') resolved.push(part);
+    }
+    return '/api/file/' + encodeURIComponent(resolved.join('/'));
+  }
+  return '/api/file/' + encodeURIComponent(src);
+}
+
+function esc(text) {
+  const el = document.createElement('span');
+  el.textContent = text;
+  return el.innerHTML;
+}
+
+function escapeJs(str) {
+  return str.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
 }
 
 function formatSize(bytes) { return bytes < 1024 ? bytes + 'B' : (bytes / 1024).toFixed(1) + 'KB'; }
