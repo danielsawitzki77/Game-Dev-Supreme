@@ -354,7 +354,8 @@ function inline(text) {
 
   // Italic
   text = text.replace(/\*(.+?)\*/g, '<em>$1</em>');
-  text = text.replace(/_(.+?)_/g, '<em>$1</em>');
+  // Underscore italic: only match at word boundaries (not inside filenames like background_tiling)
+  text = text.replace(/(^|[\s(])_([^_]+?)_([\s).,!?;:]|$)/g, '$1<em>$2</em>$3');
 
   // Strikethrough
   text = text.replace(/~~(.+?)~~/g, '<del>$1</del>');
@@ -382,9 +383,10 @@ function resolveImagePath(src) {
       if (part === '..') resolved.pop();
       else if (part !== '.') resolved.push(part);
     }
-    return '/api/file/' + encodeURIComponent(resolved.join('/'));
+    // Encode each path segment individually to preserve slashes
+    return '/api/file/' + resolved.map(s => encodeURIComponent(s)).join('/');
   }
-  return '/api/file/' + encodeURIComponent(src);
+  return '/api/file/' + src.replace(/\\/g, '/').split('/').map(s => encodeURIComponent(s)).join('/');
 }
 
 function esc(text) {

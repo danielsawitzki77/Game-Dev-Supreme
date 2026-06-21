@@ -3,7 +3,7 @@ Report Browser Server — lightweight local web server for browsing test reports
 across all game projects under the parent github directory.
 
 Usage: python server.py [--port 8090]
-Then open http://localhost:8090/reports in a browser.
+Then open http://localhost:8090/game-dev-supreme/testing/reports in a browser.
 """
 
 import http.server
@@ -67,7 +67,7 @@ class ReportHandler(http.server.SimpleHTTPRequestHandler):
 
     def do_GET(self):
         parsed = urllib.parse.urlparse(self.path)
-        if parsed.path in ("/", "/reports"):
+        if parsed.path in ("/", "/game-dev-supreme/testing/reports"):
             self.path = "/index.html"
             super().do_GET()
         elif parsed.path == "/api/reports":
@@ -157,7 +157,7 @@ class ReportHandler(http.server.SimpleHTTPRequestHandler):
 
 
 if __name__ == "__main__":
-    print(f"Report Browser running at http://localhost:{PORT}/reports")
+    print(f"Report Browser running at http://localhost:{PORT}/game-dev-supreme/testing/reports")
     print(f"Scanning projects under: {GITHUB_DIR}")
     print("Press Ctrl+C or use the Quit button in the browser to stop.")
     with http.server.HTTPServer(("", PORT), ReportHandler) as httpd:
