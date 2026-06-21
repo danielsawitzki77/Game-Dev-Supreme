@@ -165,11 +165,45 @@ If the target project has a steering doc that references visual testing using th
 2. Attach the generated report as a comment on the GitHub issue: `gh issue comment <number> --repo <repo> --body-file <path-to-report.md>`
 3. This provides visual verification that the changes did not break rendering.
 
+### Checking PR Comments
+
+Issues often reference PRs (created by Kiro or humans). These PRs may receive review comments, change requests, or general comments that need action. Each cycle, check referenced PRs for unprocessed comments:
+
+1. **Identify referenced PRs** — When processing an open issue's comments, look for PR URLs in Kiro completion comments (format: `https://github.com/danielsawitzki77/<repo>/pull/<number>`). Also check `gh pr list --repo <repo> --state open --json number,title,headRefName` for branches matching issue patterns (e.g., `issue-<number>-*`).
+
+2. **Fetch PR comments** — For each referenced PR, fetch both review comments and issue-style comments:
+   ```bash
+   # PR conversation comments (issue-style)
+   gh api repos/<owner>/<repo>/issues/<pr-number>/comments --jq '.[] | {id, body, user: .user.login, reactions: .reactions}'
+   # PR review comments (inline code review)
+   gh api repos/<owner>/<repo>/pulls/<pr-number>/comments --jq '.[] | {id, body, path, user: .user.login, reactions: .reactions}'
+   # PR reviews (approve/request changes/comment)
+   gh api repos/<owner>/<repo>/pulls/<pr-number>/reviews --jq '.[] | {id, body, state, user: .user.login}'
+   ```
+
+3. **Detect unprocessed human comments** — Same logic as issue comments:
+   - A comment is **human** if its body does NOT start with `🤖 [Kiro]`
+   - A comment is **unprocessed** if it has no 👀 (eyes) reaction
+   - PR reviews with state `CHANGES_REQUESTED` that haven't been addressed count as unprocessed
+
+4. **Act on PR comments** — When unprocessed human comments or change requests are found:
+   - Read and understand the requested change
+   - Check out the PR's branch: `git checkout <branch-name>`
+   - Implement the requested changes
+   - Commit with a message referencing the review: `fix: address review feedback (danielsawitzki77/<repo>#<issue-number>)`
+   - Push to the same branch (the PR updates automatically)
+   - Reply to the comment on the PR: `gh api repos/<owner>/<repo>/issues/<pr-number>/comments -f body="🤖 [Kiro] Addressed: <summary of change>\n\ncc @danielsawitzki77-remote"`
+   - React with 👀 on the processed comment: `gh api repos/<owner>/<repo>/issues/comments/<comment-id>/reactions -f content=eyes`
+   - For inline review comments: `gh api repos/<owner>/<repo>/pulls/comments/<comment-id>/reactions -f content=eyes`
+
+5. **Priority** — PR comments are treated as follow-ups to their parent issue. They share the same priority tier as the issue. Process them during the same cycle as the issue check.
+
 ### After Completing Work on an Issue
 
 After finishing work on one issue, **immediately check for the next issue** across all repos. This includes:
 - New issues that haven't been picked up
 - Existing open issues with new unprocessed human comments (follow-up instructions)
+- Open PRs with new unprocessed review comments or change requests
 
 Continue working until no more actionable items remain.
 
