@@ -9,7 +9,7 @@ cd report-browser
 start.bat
 ```
 
-Opens `http://localhost:8090` in your default browser.
+Opens `http://localhost:8090/game-dev-supreme/testing/reports` in your default browser.
 
 ## Features
 
