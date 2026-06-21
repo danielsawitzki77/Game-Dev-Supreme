@@ -181,6 +181,38 @@ If the target project has a steering doc that references visual testing using th
 4. **Upload GIFs as actual attachments** to issues and PRs using `tools/upload_gif.bat` from SDL_VisualTest: `"c:\Users\Daniel Sawitzki\Desktop\github\SDL_VisualTest\tools\upload_gif.bat" <repo> <number> <gif_path> "<caption>"`. This uploads the GIF to a GitHub release asset and posts a comment with the embedded image URL so it renders inline. Do NOT just reference local file paths — GIFs must be uploaded and visible in the browser.
 5. This provides visual verification that the changes did not break rendering and documents the user interaction path.
 
+### GIF Flow Selection (Default Behavior)
+
+When recording a GIF for an issue, **always select the flow that exercises the issue's critical path**. This is the default behavior — no bespoke per-issue modifications should be needed.
+
+Use the `--flow` argument to select the relevant test flow:
+
+```bash
+tests\test_integration_diverse.exe --seed 1 --runs 1 --gif --flow <flow-name>
+```
+
+**Flow name selection logic:** Deduce the correct flow from the issue title and body:
+
+| Issue keywords | Flow name |
+|---|---|
+| stop, stop button, playback controls | `stop-button` |
+| campaign, examples, level select | `campaign` |
+| tutorial | `tutorials` |
+| challenge | `challenges` |
+| editor, sandbox, create level | `editor` |
+| settings, preferences, options | `settings` |
+| exit, quit, leave | `exit` |
+| win, victory, complete | `win` |
+| lose, fail, timeout, game over | `lose` |
+| overlay, popup, dialog | `overlay` |
+
+If no clear match, use `campaign` as the default flow (most common user path).
+
+**Adding new flows:** When a new feature area needs GIF coverage:
+1. Add a `BuildFlow<Name>(int seed)` function in `test_integration_diverse.cpp`
+2. Add the name to the `g_namedFlows[]` lookup table
+3. No other changes needed — Kiro will automatically select it based on issue keywords
+
 ### Checking PR Comments
 
 Issues often reference PRs (created by Kiro or humans). These PRs may receive review comments, change requests, or general comments that need action. Each cycle, check referenced PRs for unprocessed comments:
