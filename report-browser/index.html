@@ -382,9 +382,9 @@ function resolveImagePath(src) {
       if (part === '..') resolved.pop();
       else if (part !== '.') resolved.push(part);
     }
-    return '/api/file/' + encodeURIComponent(resolved.join('/'));
+    return '/api/file/' + resolved.map(encodeURIComponent).join('/');
   }
-  return '/api/file/' + encodeURIComponent(src);
+  return '/api/file/' + src.replace(/\\/g, '/').split('/').map(encodeURIComponent).join('/');
 }
 
 function esc(text) {
