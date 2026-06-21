@@ -123,6 +123,19 @@ GitHub repo names do NOT always match local folder names. **Never clone a repo i
 - **In issue comments** (issue repo): Reference PRs with full URLs: `https://github.com/danielsawitzki77/<pr-repo>/pull/<pr-number>`
 - **Never use bare `#<number>`** unless the reference is within the same repo where you're posting
 
+### Pull Latest Before Working
+
+Before starting any work on a repo, **always pull latest on ALL local repos** — not just the target. Dependency repos (SDL_VisualTest, SDL, SDL_image, etc.) may have been updated by previous PRs.
+
+At the start of each work cycle (before creating a feature branch):
+
+1. For **each repo** in the local path mapping table:
+   - `cd <local-path>; git checkout main; git pull`
+2. This ensures library code, build scripts, and shared tooling are up to date.
+3. Only then proceed to create the feature branch in the target repo.
+
+This prevents stale-dependency issues (e.g., missing classes from recently merged PRs).
+
 ### Work Execution
 
 - Follow existing project conventions (steering docs, build systems, etc.)
@@ -165,7 +178,7 @@ If the target project has a steering doc that references visual testing using th
 1. After implementing changes, run the SDL_VisualTest suite report generator to execute tests and produce the Markdown report with screenshots.
 2. If GIF recording is enabled (project uses `--gif` flag or `run_diverse_tests.bat`), the test run also produces animated GIFs in `test_output/diverse_runs/run_seed<N>/gifs/`. The report generator automatically embeds these in the "Interaction Recordings" section.
 3. Attach the generated report as a comment on the GitHub issue: `gh issue comment <number> --repo <repo> --body-file <path-to-report.md>`
-4. Reference GIF paths in PR descriptions when functional changes are involved. Upload using `tools/upload_gif.bat` from SDL_VisualTest: `"c:\Users\Daniel Sawitzki\Desktop\github\SDL_VisualTest\tools\upload_gif.bat" <repo> <number> <gif_path> "<caption>"`
+4. **Upload GIFs as actual attachments** to issues and PRs using `tools/upload_gif.bat` from SDL_VisualTest: `"c:\Users\Daniel Sawitzki\Desktop\github\SDL_VisualTest\tools\upload_gif.bat" <repo> <number> <gif_path> "<caption>"`. This uploads the GIF to a GitHub release asset and posts a comment with the embedded image URL so it renders inline. Do NOT just reference local file paths — GIFs must be uploaded and visible in the browser.
 5. This provides visual verification that the changes did not break rendering and documents the user interaction path.
 
 ### Checking PR Comments
