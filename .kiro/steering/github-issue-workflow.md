@@ -163,8 +163,10 @@ The script uses the caller's working directory (`%CD%`) to locate the project's 
 If the target project has a steering doc that references visual testing using the SDL visual testing solution:
 
 1. After implementing changes, run the SDL_VisualTest suite report generator to execute tests and produce the Markdown report with screenshots.
-2. Attach the generated report as a comment on the GitHub issue: `gh issue comment <number> --repo <repo> --body-file <path-to-report.md>`
-3. This provides visual verification that the changes did not break rendering.
+2. If GIF recording is enabled (project uses `--gif` flag or `run_diverse_tests.bat`), the test run also produces animated GIFs in `test_output/diverse_runs/run_seed<N>/gifs/`. The report generator automatically embeds these in the "Interaction Recordings" section.
+3. Attach the generated report as a comment on the GitHub issue: `gh issue comment <number> --repo <repo> --body-file <path-to-report.md>`
+4. Reference GIF paths in PR descriptions when functional changes are involved. Upload using `tools/upload_gif.bat` from SDL_VisualTest: `"c:\Users\Daniel Sawitzki\Desktop\github\SDL_VisualTest\tools\upload_gif.bat" <repo> <number> <gif_path> "<caption>"`
+5. This provides visual verification that the changes did not break rendering and documents the user interaction path.
 
 ### Checking PR Comments
 
