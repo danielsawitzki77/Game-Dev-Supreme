@@ -33,10 +33,13 @@ The following repos are monitored for issues:
 When picking up an issue:
 
 1. **Assign it** to `danielsawitzki77` if not already assigned: `gh issue edit <number> --repo <repo> --add-assignee danielsawitzki77`
-2. **React with 👀** on the issue itself to signal it's being worked on: `gh api repos/<owner>/<repo>/issues/<number>/reactions -f content=eyes`
+2. **React with 👀** on the issue itself to signal processing has started: `gh api repos/<owner>/<repo>/issues/<number>/reactions -f content=eyes`
 3. **Post a comment** indicating work has started: `gh issue comment <number> --repo <repo> --body "🤖 [Kiro] Picking up this issue and starting work."`
 4. **Read the full issue body** to understand the task
 5. **Fill in missing fields** by common sense (labels, milestone if obvious)
+6. **After work is complete**, add a 👍 reaction on the issue to signal completion: `gh api repos/<owner>/<repo>/issues/<number>/reactions -f content=+1`
+
+The two-phase reaction pattern (👀 → 👍) lets observers see at a glance whether an issue is being actively worked on or is finished.
 
 ## Working on an Issue
 
@@ -65,7 +68,13 @@ When checking open issues for follow-up:
 1. Fetch comments: `gh api repos/<owner>/<repo>/issues/<number>/comments --jq '.[] | {id, body, user: .user.login, reactions: .reactions}'`
 2. A comment is **human** if its body does NOT start with `🤖 [Kiro]`
 3. A comment is **unprocessed** if it has no 👀 (eyes) reaction from the bot
-4. Process unprocessed human comments **sequentially**, posting a separate reply for each one, then react with 👀 on each after processing it.
+4. Process unprocessed human comments **sequentially** using the two-phase reaction pattern:
+   - **Immediately** react with 👀 on the comment to signal processing has started: `gh api repos/<owner>/<repo>/issues/comments/<comment-id>/reactions -f content=eyes`
+   - Read and act on the comment's instructions
+   - Post a reply
+   - **After replying**, add a 👍 reaction to signal processing is complete: `gh api repos/<owner>/<repo>/issues/comments/<comment-id>/reactions -f content=+1`
+
+The two-phase pattern (👀 → 👍) on comments mirrors the issue-level pattern and lets observers distinguish "being worked on" from "done".
 
 ### Processing Screenshots and Images
 

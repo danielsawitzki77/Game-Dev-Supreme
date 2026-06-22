@@ -66,11 +66,13 @@ Run `install.bat` to copy the steering doc to `~/.kiro/steering/` (needed for gl
 
 ## Issue Lifecycle
 
-1. Kiro picks up an issue → assigns it, posts `🤖 [Kiro]` comment
-2. Work is completed → PR created, summary comment posted, issue stays OPEN
+1. Kiro picks up an issue → assigns it, reacts with 👀, posts `🤖 [Kiro]` comment
+2. Work is completed → PR created, summary comment posted, reacts with 👍, issue stays OPEN
 3. Human reviews → adds comments with follow-up or approval
-4. Kiro processes follow-ups → acts on human comments, marks with 👀
+4. Kiro processes follow-ups → reacts with 👀 immediately, acts on comment, replies, then reacts with 👍
 5. Human approves closure → only then does Kiro close the issue
+
+The two-phase reaction pattern (👀 → 👍) applies at both issue and comment level, letting observers distinguish "being worked on" from "done" at a glance.
 
 ## How Kiro Handles Local Changes and Merge Conflicts
 
