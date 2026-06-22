@@ -46,17 +46,38 @@ The two-phase reaction pattern (👀 → 👍) lets observers see at a glance wh
 ### Communication
 
 - **All machine-generated comments** must be prefixed with `🤖 [Kiro]` so they can be identified as non-human.
-- **Tag the user**: Every comment must end with `\n\ncc @danielsawitzki77-remote` so the user receives a GitHub notification.
-- **Questions/blockers**: Post as a comment on the issue: `gh issue comment <number> --repo <repo> --body "🤖 [Kiro] <question>\n\ncc @danielsawitzki77-remote"`
+- **Tag the user**: Every comment must end with a blank line followed by `cc @danielsawitzki77-remote` so the user receives a GitHub notification.
+- **Questions/blockers**: Post as a comment on the issue (see Comment Posting below)
 - **Progress updates**: Post as comments when reaching significant milestones
 - **Completion**: Post a summary comment (do NOT close the issue — see Issue Lifecycle below)
+
+### Comment Posting (--body-file)
+
+**Always use `--body-file` with a temp file for GitHub comments and PR bodies.** Never use `--body "...\n..."` — Windows CMD does not interpret `\n` as newlines, resulting in literal `\n` text in comments.
+
+Workflow for posting any comment:
+
+1. Write the comment content to a temp file (e.g., `%TEMP%\gh_comment.md`)
+2. Post using: `gh issue comment <number> --repo <repo> --body-file <temp-file>`
+3. Delete the temp file
+
+Example:
+```batch
+echo 🤖 [Kiro] Picking up this issue.> %TEMP%\gh_comment.md
+echo.>> %TEMP%\gh_comment.md
+echo cc @danielsawitzki77-remote>> %TEMP%\gh_comment.md
+gh issue comment <number> --repo <repo> --body-file %TEMP%\gh_comment.md
+del %TEMP%\gh_comment.md
+```
+
+For Kiro CLI (non-batch context), write the temp file using the file-writing tool, then invoke `gh issue comment --body-file`. This guarantees correct newlines on all platforms.
 
 ### Issue Lifecycle
 
 Issues follow a managed lifecycle rather than being auto-closed:
 
 1. **Issues stay open** after work is completed. Do NOT close issues automatically.
-2. **After completing work**, post a summary comment: `gh issue comment <number> --repo <repo> --body "🤖 [Kiro] ✅ Work complete. <summary of what was done>. PR: <link>. Awaiting human approval to close."`
+2. **After completing work**, post a summary comment (using `--body-file`): `🤖 [Kiro] ✅ Work complete. <summary of what was done>. PR: <link>. Awaiting human approval to close.`
 3. **Check for new human comments** on open issues each cycle. Human comments are any comments NOT prefixed with `🤖 [Kiro]`. If new human comments contain follow-up instructions, treat them as additional work items on that issue.
 4. **Mark processed comments with a reaction** to track progress: `gh api repos/<owner>/<repo>/issues/comments/<comment-id>/reactions -f content=eyes` — use the 👀 reaction to indicate the comment has been read and acted upon.
 5. **Only close an issue** when a human comment explicitly approves closure (e.g., "looks good", "approved", "close this", "done"). Then close with: `gh issue close <number> --repo <repo> --comment "🤖 [Kiro] Closing as approved."`
@@ -150,7 +171,7 @@ This prevents stale-dependency issues (e.g., missing classes from recently merge
 - Follow existing project conventions (steering docs, build systems, etc.)
 - Create a feature branch for the work: `git checkout -b issue-<number>-<short-description>`
 - Commit with conventional messages referencing the issue: `fix: <description> (danielsawitzki77/<issue-repo>#<number>)`
-- Push to the branch and create a PR: `gh pr create --repo <target-repo> --title "<title>" --body "Addresses danielsawitzki77/<issue-repo>#<number>\n\n<description of changes>"`
+- Push to the branch and create a PR: `gh pr create --repo <target-repo> --title "<title>" --body-file <temp-file>` (write PR body to a temp file first to preserve newlines)
 - Assign the PR to the issue's assignees: `gh pr edit <pr-number> --repo <target-repo> --add-assignee <assignee1>,<assignee2>`
 - **Always assign `danielsawitzki77`** to the PR even if the issue has no assignees: `gh pr edit <pr-number> --repo <target-repo> --add-assignee danielsawitzki77`
 - After PR creation, post a completion comment on the issue with the full PR URL (do NOT close it)
@@ -294,8 +315,8 @@ gh api repos/<owner>/<repo>/issues/<number>/comments --jq '.[] | {id, body, user
 # React to a comment (mark as processed)
 gh api repos/<owner>/<repo>/issues/comments/<comment-id>/reactions -f content=eyes
 
-# Comment on an issue
-gh issue comment <number> --repo <owner/repo> --body "🤖 [Kiro] <message>\n\ncc @danielsawitzki77-remote"
+# Comment on an issue (always use --body-file for multi-line)
+gh issue comment <number> --repo <owner/repo> --body-file <temp-file>
 
 # Close an issue (only when human-approved)
 gh issue close <number> --repo <owner/repo> --comment "🤖 [Kiro] Closing as approved."
@@ -303,8 +324,8 @@ gh issue close <number> --repo <owner/repo> --comment "🤖 [Kiro] Closing as ap
 # Assign an issue
 gh issue edit <number> --repo <owner/repo> --add-assignee danielsawitzki77
 
-# Create a PR
-gh pr create --repo <owner/repo> --title "<title>" --body "<body>" --head <branch>
+# Create a PR (always use --body-file for multi-line)
+gh pr create --repo <owner/repo> --title "<title>" --body-file <temp-file> --head <branch>
 
 # Assign PR to issue assignees
 gh pr edit <pr-number> --repo <owner/repo> --add-assignee <assignee1>,<assignee2>
