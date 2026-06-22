@@ -147,11 +147,37 @@ GitHub repo names do NOT always match local folder names. **Never clone a repo i
 
 ### Cross-Repo References
 
-**Critical:** GitHub interprets `#<number>` relative to the repo where the comment or PR lives. When working across repos, ALWAYS use fully-qualified references: `danielsawitzki77/<repo>#<number>`.
+**Critical:** GitHub interprets `#<number>` relative to the repo where the comment or PR lives. When working across repos, ALWAYS use fully-qualified references.
 
-- **In PR bodies** (target repo): Reference the source issue as `danielsawitzki77/<issue-repo>#<number>` (e.g., `Addresses danielsawitzki77/Game-Dev-Supreme#32`)
-- **In issue comments** (issue repo): Reference PRs with full URLs: `https://github.com/danielsawitzki77/<pr-repo>/pull/<pr-number>`
-- **Never use bare `#<number>`** unless the reference is within the same repo where you're posting
+**Rules by context:**
+
+| Where you're posting | How to reference an issue | How to reference a PR |
+|---|---|---|
+| **PR body** (in target repo) | `danielsawitzki77/<issue-repo>#<number>` | N/A (it IS the PR) |
+| **Issue comment** (in issue repo) | `#<number>` (same repo, OK) | Full URL: `https://github.com/danielsawitzki77/<pr-repo>/pull/<number>` |
+| **PR comment** (in target repo) | `danielsawitzki77/<issue-repo>#<number>` | `#<number>` (same repo, OK) |
+| **Commit message** (in target repo) | `danielsawitzki77/<issue-repo>#<number>` | N/A |
+
+**Key principle:** Use bare `#<number>` ONLY when referencing something in the SAME repo where the text will appear. For anything cross-repo, use either:
+- Fully-qualified: `danielsawitzki77/<repo>#<number>` (for issues)
+- Full URL: `https://github.com/danielsawitzki77/<repo>/pull/<number>` (for PRs — always use full URL for PRs since `danielsawitzki77/<repo>#<number>` links to the issue with that number, not the PR)
+
+**Concrete examples:**
+
+Issue filed in `Game-Dev-Supreme#60`, PR created in `Zeitgeist-Evolved`:
+- PR body: `Addresses danielsawitzki77/Game-Dev-Supreme#60`
+- Issue completion comment: `PR: https://github.com/danielsawitzki77/Zeitgeist-Evolved/pull/42`
+- Commit message: `fix: menu navigation (danielsawitzki77/Game-Dev-Supreme#60)`
+
+Issue filed in `Game-Dev-Supreme#61`, PR created in `SDL_VisualTest`:
+- PR body: `Addresses danielsawitzki77/Game-Dev-Supreme#61`
+- Issue completion comment: `PR: https://github.com/danielsawitzki77/SDL_VisualTest/pull/19`
+- Commit message: `feat: add spec (danielsawitzki77/Game-Dev-Supreme#61)`
+
+**Common mistakes to avoid:**
+- ❌ `PR: #42` in a Game-Dev-Supreme issue comment (links to Game-Dev-Supreme#42, not the PR)
+- ❌ `Addresses #60` in a Zeitgeist-Evolved PR (links to Zeitgeist-Evolved#60, not Game-Dev-Supreme#60)
+- ❌ `danielsawitzki77/Zeitgeist-Evolved#42` for a PR (links to issue #42, not PR #42 — use full URL instead)
 
 ### Pull Latest Before Working
 
