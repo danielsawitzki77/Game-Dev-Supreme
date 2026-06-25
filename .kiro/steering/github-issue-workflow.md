@@ -200,6 +200,7 @@ This prevents stale-dependency issues (e.g., missing classes from recently merge
 - Push to the branch and create a PR: `gh pr create --repo <target-repo> --title "<title>" --body-file <temp-file>` (write PR body to a temp file first to preserve newlines)
 - Assign the PR to the issue's assignees: `gh pr edit <pr-number> --repo <target-repo> --add-assignee <assignee1>,<assignee2>`
 - **Always assign `danielsawitzki77`** to the PR even if the issue has no assignees: `gh pr edit <pr-number> --repo <target-repo> --add-assignee danielsawitzki77`
+- **Always request review from `danielsawitzki77-remote`** so the human gets a GitHub notification: `gh pr edit <pr-number> --repo <target-repo> --add-reviewer danielsawitzki77-remote`
 - After PR creation, post a completion comment on the issue with the full PR URL (do NOT close it)
 
 ### Handling Local Changes and Merge Conflicts
