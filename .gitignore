@@ -4,4 +4,7 @@ NO_WORK
 no_work.flag
 kiro_no_work.tmp
 
+# Auto-generated combined steering doc (rebuilt each cycle by build-cli-steering.bat)
+cli-steering-combined.md
+
 __pycache__/
