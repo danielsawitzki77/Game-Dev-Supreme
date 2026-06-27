@@ -238,6 +238,34 @@ If the target project has a steering doc that references visual testing using th
 4. **Upload GIFs as actual attachments** to issues and PRs using `tools/upload_gif.bat` from SDL_VisualTest: `"c:\Users\Daniel Sawitzki\Desktop\github\SDL_VisualTest\tools\upload_gif.bat" <repo> <number> <gif_path> "<caption>"`. This uploads the GIF to a GitHub release asset and posts a comment with the embedded image URL so it renders inline. Do NOT just reference local file paths — GIFs must be uploaded and visible in the browser.
 5. This provides visual verification that the changes did not break rendering and documents the user interaction path.
 
+### Build Provenance Verification
+
+Before uploading any GIF to a GitHub issue or PR, **verify build provenance** to ensure the recording reflects the current code:
+
+1. **Read `build_info.txt`** from the test output directory (the directory containing the GIF or its parent). This file is written by the build script after each test run.
+
+2. **Verify required fields exist.** The file must contain both a `commit` field and a `timestamp` field in `key=value` format. If `build_info.txt` does not exist:
+   - Abort the upload
+   - Post a comment on the issue: `🤖 [Kiro] GIF upload aborted: build_info.txt not found. Run tests before uploading.`
+   - Do NOT proceed with the upload
+
+3. **If `build_info.txt` exists but is missing `commit` or `timestamp` fields:**
+   - Abort the upload
+   - Post a comment on the issue: `🤖 [Kiro] GIF upload aborted: build_info.txt is malformed (missing required fields). Re-run tests before uploading.`
+   - Do NOT proceed with the upload
+
+4. **Verify the `commit` field matches current HEAD.** Get the full 40-character SHA of the currently checked-out branch (`git rev-parse HEAD`) and compare it against the `commit` field value. If they do not match:
+   - Abort the upload
+   - Post a comment on the issue: `🤖 [Kiro] GIF upload aborted: build_info.txt commit (<recorded>) does not match current HEAD (<actual>). Re-run tests before uploading.`
+   - Replace `<recorded>` with the value from build_info.txt and `<actual>` with the current HEAD SHA
+   - Do NOT proceed with the upload
+
+5. **Check timestamp freshness.** Parse the `timestamp` field (ISO 8601 UTC format) and compare against the current system time. If the timestamp is older than 60 minutes:
+   - Post a warning comment on the issue: `🤖 [Kiro] WARNING: Test results are over 60 minutes old`
+   - **Allow the upload to proceed** (this is a warning only, not a blocker)
+
+6. **If all checks pass** (build_info.txt exists, has required fields, commit matches HEAD), proceed with the GIF upload as normal.
+
 ### GIF Flow Selection (Default Behavior)
 
 When recording a GIF for an issue, **always select the flow that exercises the issue's critical path**. This is the default behavior — no bespoke per-issue modifications should be needed.
