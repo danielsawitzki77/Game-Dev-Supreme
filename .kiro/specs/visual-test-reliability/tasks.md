@@ -41,10 +41,16 @@ This plan implements reliability hardening across three repositories to eliminat
     - **Validates: Requirements 1.2, 6.3, 6.4**
 
 - [x] 2. Zeitgeist-Evolved: Generic level gameplay flow
+  - [x] 2.0 Fix KeyboardNavigationHandler consuming arrow keys when no focus movement occurs
+    - In `src/ui/KeyboardNavigationHandler.cpp`, modify `HandleArrowKey()` to return `false` when `MoveFocus()` did not actually change the focused widget (i.e., `GetNextFocusable()` returned nullptr or the same widget)
+    - This allows pages like CampaignPage that handle arrow keys directly in their `HandleEvent` to receive those events
+    - Without this fix, CampaignPage's Up/Down level navigation via arrow keys is completely broken
+    - _Requirements: 7.1, 7.4_
+
   - [x] 2.1 Create BuildGenericGameplayFlow function in test_integration_diverse.cpp
     - Create a new function `BuildGenericGameplayFlow(int seed, int folder_index, int level_index)` that:
-    - Navigates to the specified campaign folder (0=Examples, 1=Tutorials, 2=Challenges) using Right key presses
-    - Selects the level at `level_index` position using Down key presses + Enter
+    - Navigates from main menu: Enter (campaign) → S key presses to reach campaign at folder_index → Enter (confirm campaign into Phase 2) → S key presses to reach level at level_index → Enter (load level)
+    - Uses S/W keys (not arrow keys) for CampaignPage navigation because KeyboardNavigationHandler consumes arrows before CampaignPage sees them
     - Performs generic gadget placement: Tab to item panel, navigate down by `seed % 5` steps, Tab back to grid, move cursor with WASD by seed-derived offsets, Enter to place, repeat 2-4 times based on seed
     - Rotates the last-placed gadget `seed % 4` times using R key
     - Starts simulation with P key
