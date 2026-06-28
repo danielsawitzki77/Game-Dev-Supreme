@@ -230,13 +230,32 @@ The script uses the caller's working directory (`%CD%`) to locate the project's 
 
 ### Visual Testing (SDL Projects)
 
-If the target project has a steering doc that references visual testing using the SDL visual testing solution:
+#### MANDATORY GIF REQUIREMENT
 
-1. After implementing changes, run the SDL_VisualTest suite report generator to execute tests and produce the Markdown report with screenshots.
-2. If GIF recording is enabled (project uses `--gif` flag or `run_diverse_tests.bat`), the test run also produces animated GIFs in `test_output/diverse_runs/run_seed<N>/gifs/`. The report generator automatically embeds these in the "Interaction Recordings" section.
-3. Attach the generated report as a comment on the GitHub issue: `gh issue comment <number> --repo <repo> --body-file <path-to-report.md>`
-4. **Upload GIFs as actual attachments** to issues and PRs using `tools/upload_gif.bat` from SDL_VisualTest: `"c:\Users\Daniel Sawitzki\Desktop\github\SDL_VisualTest\tools\upload_gif.bat" <repo> <number> <gif_path> "<caption>"`. This uploads the GIF to a GitHub release asset and posts a comment with the embedded image URL so it renders inline. Do NOT just reference local file paths — GIFs must be uploaded and visible in the browser.
-5. This provides visual verification that the changes did not break rendering and documents the user interaction path.
+**CRITICAL:** If the issue body contains ANY of the following phrases, GIF recording and upload is MANDATORY — you MUST NOT post a completion comment or mark work as done until the GIF has been recorded, uploaded, and posted:
+
+- "animated GIF"
+- "SDL_VisualTest_GifRecorder"
+- "capture an animated GIF"
+- "Attach the GIF"
+- "record a GIF"
+
+**Enforcement:** Before posting any "✅ Work complete" comment, verify:
+1. A GIF was recorded (file exists in `test_output/diverse_runs/run_seed<N>/gifs/`)
+2. The GIF was uploaded via `upload_gif.bat` (not just referenced locally)
+3. The upload comment is visible on the issue
+
+If any of these are not satisfied and the issue body requires a GIF, DO NOT post the completion comment. Instead, go back and record/upload the GIF first.
+
+#### Execution Steps
+
+When visual testing applies (issue body requests it, OR the target project has a steering doc referencing SDL visual testing):
+
+1. **Build and run tests** using `scripts/run_diverse_tests.bat` (Zeitgeist) or `tools/build_and_record.bat` (SDL_VisualTest). This produces screenshots, GIFs, and a Markdown report.
+2. **Verify GIF exists** in `test_output/diverse_runs/run_seed<N>/gifs/`. If it doesn't exist, the test flow may not have the `--gif` flag — re-run with `--gif` explicitly.
+3. **Attach the report** as a comment on the GitHub issue: `gh issue comment <number> --repo <repo> --body-file <path-to-report.md>`
+4. **Upload GIFs as actual attachments** using `tools/upload_gif.bat` from SDL_VisualTest: `"c:\Users\Daniel Sawitzki\Desktop\github\SDL_VisualTest\tools\upload_gif.bat" <repo> <number> <gif_path> "<caption>"`. This uploads the GIF to a GitHub release asset and posts a comment with the embedded image URL so it renders inline. Do NOT just reference local file paths — GIFs must be uploaded and visible in the browser.
+5. **Only then** proceed to post the completion comment and create/finalize the PR.
 
 ### Build Provenance Verification
 
