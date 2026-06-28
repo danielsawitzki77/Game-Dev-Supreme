@@ -13,6 +13,7 @@ The following repos are monitored for issues:
 - `danielsawitzki77/Super-Civ-16`
 - `danielsawitzki77/TerrorForm`
 - `danielsawitzki77/Game-Dev-Supreme`
+- `danielsawitzki77/Particluar`
 
 ## Issue Pickup Logic
 
@@ -124,6 +125,7 @@ Mapping of common keywords to repos:
 - "super civ", "civ 16" → `Super-Civ-16`
 - "terrorform", "terraform" → `TerrorForm`
 - "game dev supreme", "issue checker", "hooks", "polling", "batch file" → `Game-Dev-Supreme`
+- "particluar", "particle" → `Particluar`
 
 ### Local Path Mapping
 
@@ -136,6 +138,7 @@ GitHub repo names do NOT always match local folder names. **Never clone a repo i
 | `Super-Civ-16` | `Super Civ 16` | `c:\Users\Daniel Sawitzki\Desktop\github\Super Civ 16` |
 | `TerrorForm` | `TerrorForm` | `c:\Users\Daniel Sawitzki\Desktop\github\TerrorForm` |
 | `Game-Dev-Supreme` | `Game-Dev-Supreme` | `c:\Users\Daniel Sawitzki\Desktop\github\Game-Dev-Supreme` |
+| `Particluar` | `Particluar` | `c:\Users\Daniel Sawitzki\Desktop\github\Particluar` |
 
 **Critical rule:** When determining if a repo is "available in the workspace", check this mapping table — do NOT rely on the GitHub repo slug matching a folder name exactly. A mismatch (e.g., hyphen vs space) does not mean the repo is missing. If the mapped local path exists, use it. Never `git clone` a repo that already has a local folder listed here.
 
