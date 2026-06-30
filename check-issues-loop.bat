@@ -48,6 +48,9 @@ cd /d "%WORK_DIR%"
 REM Determine current hour for interval selection
 set "TIMESTR=%time: =0%"
 set "HOUR=%TIMESTR:~0,2%"
+REM Strip leading zero to prevent octal interpretation (08, 09 are invalid octal)
+if "%HOUR:~0,1%"=="0" set "HOUR=%HOUR:~1%"
+if "%HOUR%"=="" set "HOUR=0"
 set /a HOUR=%HOUR%
 
 REM Default to active interval
