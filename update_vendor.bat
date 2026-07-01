@@ -6,7 +6,7 @@ REM Call this from any game project directory:
 REM   ..\Game-Dev-Supreme\update_vendor.bat
 REM
 REM It auto-detects the calling directory and updates its vendor\ folder
-REM from sibling source repos (SDL, SDL_image, picojson, stb).
+REM from sibling source repos (SDL, SDL_image, picojson, stb, rapidcheck).
 REM Each copy has its .git directory removed so the vendor folder can be
 REM committed directly without nested-repo warnings.
 REM
@@ -15,6 +15,7 @@ REM   ..\SDL
 REM   ..\SDL_image
 REM   ..\picojson
 REM   ..\stb
+REM   ..\rapidcheck (optional — skipped if not present)
 REM ============================================================================
 
 setlocal enabledelayedexpansion
@@ -78,7 +79,7 @@ if exist "%VENDOR_DIR%\picojson\.git" rmdir /s /q "%VENDOR_DIR%\picojson\.git"
 echo       Done.
 
 REM --- stb (sparse: only needed headers) ---
-echo [4/4] Updating stb...
+echo [4/5] Updating stb...
 if not exist "%PARENT_DIR%\stb" (
     echo ERROR: Source repo not found at %PARENT_DIR%\stb
     goto :error
@@ -98,6 +99,24 @@ if errorlevel 1 goto :error
 copy /y "%PARENT_DIR%\stb\stb_image_write.h" "%VENDOR_DIR%\stb\" >nul
 if errorlevel 1 goto :error
 echo       Done.
+
+REM --- rapidcheck (property-based testing library) ---
+echo [5/5] Updating rapidcheck...
+if not exist "%PARENT_DIR%\rapidcheck" (
+    echo       SKIP: Source repo not found at %PARENT_DIR%\rapidcheck (optional)
+    goto :skip_rapidcheck
+)
+if exist "%VENDOR_DIR%\rapidcheck" (
+    echo       Removing old copy...
+    rmdir /s /q "%VENDOR_DIR%\rapidcheck"
+)
+echo       Copying from %PARENT_DIR%\rapidcheck ...
+xcopy "%PARENT_DIR%\rapidcheck\include" "%VENDOR_DIR%\rapidcheck\include\" /E /I /Q /H /Y >nul
+if errorlevel 1 goto :error
+xcopy "%PARENT_DIR%\rapidcheck\src" "%VENDOR_DIR%\rapidcheck\src\" /E /I /Q /H /Y >nul
+if errorlevel 1 goto :error
+echo       Done.
+:skip_rapidcheck
 
 echo.
 echo === All vendor dependencies updated successfully ===
