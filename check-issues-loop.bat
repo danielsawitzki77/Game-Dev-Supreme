@@ -11,7 +11,13 @@ REM Polling frequency:
 REM   - 10 minutes (600s) during active hours (8am-10pm PST)
 REM   - 30 minutes (1800s) during quiet hours (10pm-8am PST)
 REM
-REM During the countdown, press any key to force an immediate check.
+REM Controls:
+REM   During countdown:
+REM     C = force an immediate check
+REM     P = PAUSE polling (suspends all activity)
+REM   While paused:
+REM     Any key = resume + trigger immediate check
+REM
 REM If Kiro found and worked on an issue, the next check runs
 REM immediately (no wait). Waits only when no work was found.
 REM
@@ -36,13 +42,17 @@ echo ============================================================
 echo  Kiro Issue Worker - Adaptive Polling
 echo  Active hours (8am-10pm PST): every %INTERVAL_ACTIVE%s
 echo  Quiet hours (10pm-8am PST):  every %INTERVAL_QUIET%s
-echo  Press any key during countdown to check immediately
+echo  During countdown: C=check now, P=pause polling
+echo  While paused: any key resumes + triggers immediate check
 echo  Working directory: %WORK_DIR%
 echo  Press Ctrl+C to stop
 echo ============================================================
 echo.
 
 cd /d "%WORK_DIR%"
+
+REM Initialize pause state
+set "PAUSED=0"
 
 :loop
 REM Determine current hour for interval selection
@@ -90,20 +100,66 @@ if exist "%MARKER_FILE%" (
     echo  Kiro Issue Worker - Adaptive Polling
     echo  Active hours ^(8am-10pm PST^): every %INTERVAL_ACTIVE%s
     echo  Quiet hours ^(10pm-8am PST^):  every %INTERVAL_QUIET%s
-    echo  Press any key during countdown to check immediately
+    echo  During countdown: C=check now, P=pause polling
+    echo  While paused: any key resumes + triggers immediate check
     echo  Working directory: %WORK_DIR%
     echo  Press Ctrl+C to stop
     echo ============================================================
     echo.
     echo No actionable issues found. Waiting %INTERVAL_SEC% seconds...
-    echo Press any key to check immediately.
+    echo Press C to check immediately, or P to pause.
     echo.
-    timeout /t %INTERVAL_SEC%
+    call :wait_with_pause %INTERVAL_SEC%
 ) else (
     echo Work was processed! Re-checking immediately for more issues...
     echo.
 )
+
+REM Check if we entered paused state
+if "%PAUSED%"=="1" goto :paused
 goto loop
+
+:paused
+echo.
+echo ============================================================
+echo  *** PAUSED *** Polling is suspended.
+echo  Press any key to resume and trigger an immediate check...
+echo ============================================================
+echo.
+pause >nul
+set "PAUSED=0"
+echo [%date% %time%] Resumed! Triggering immediate check...
+echo.
+goto loop
+
+REM ============================================================
+REM Subroutine: wait_with_pause
+REM Waits for the specified number of seconds using 5-second
+REM intervals with choice /T. If the user presses P, sets
+REM PAUSED=1 and returns. If C is pressed, returns immediately
+REM to trigger the next check. If the timeout elapses fully,
+REM returns normally.
+REM
+REM Usage: call :wait_with_pause <seconds>
+REM ============================================================
+:wait_with_pause
+set /a "WAIT_REMAINING=%~1"
+:wait_loop
+if %WAIT_REMAINING% LEQ 0 goto :eof
+echo    [%WAIT_REMAINING%s remaining] P=pause, C=check now
+choice /C PCN /N /T 5 /D N >nul 2>&1
+if %errorlevel%==1 (
+    REM P was pressed — enter pause mode
+    set "PAUSED=1"
+    goto :eof
+)
+if %errorlevel%==2 (
+    REM C was pressed — user wants immediate check
+    goto :eof
+)
+REM N was selected (timeout elapsed) — decrement and continue
+set /a "WAIT_REMAINING=WAIT_REMAINING - 5"
+goto :wait_loop
 
 REM ============================================================
 REM Subroutine: cleanup_branches
