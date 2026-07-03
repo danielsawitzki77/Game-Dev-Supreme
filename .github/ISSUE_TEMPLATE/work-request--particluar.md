@@ -14,7 +14,7 @@ We need a change or fix or improvement to be made in Particluar. This is the par
 - `src/main.cpp` — Application PoC
 - `tools/mapgen/` — Offline CLI map generator
 - `tools/tilename/` — Tile naming CLI tool
-- `tools/web-editor/` — Node.js/TypeScript web editor (Tileset Configurator + Level Editor)
+- `tools/tileset-editor/` — Node.js/TypeScript web editor (Tileset Configurator + Level Editor)
 - `scripts/` — PowerShell GUI wrapper
 - `assets/tilesets/` — Tileset data (PNG + JSON sidecar)
 - `assets/maps/` — Map files
