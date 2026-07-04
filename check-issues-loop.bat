@@ -145,14 +145,13 @@ REM Usage: call :wait_with_pause <seconds>
 REM ============================================================
 :wait_with_pause
 set /a "WAIT_REMAINING=%~1"
-REM Create a carriage return character in variable CR
-for /f %%A in ('copy /Z "%~dpf0" nul') do set "CR=%%A"
 :wait_loop
 if %WAIT_REMAINING% LEQ 0 (
     echo.
     goto :eof
 )
-<nul set /p "=%CR%   [%WAIT_REMAINING%s remaining] P=pause, C=check now   "
+REM Use PowerShell to write carriage-return based overwrite (reliable across terminals)
+powershell -NoProfile -Command "Write-Host -NoNewline \"`r   [%WAIT_REMAINING%s remaining] P=pause, C=check now   `r\""
 choice /C PCN /N /T 5 /D N >nul 2>&1
 if %errorlevel%==1 (
     REM P was pressed — enter pause mode
