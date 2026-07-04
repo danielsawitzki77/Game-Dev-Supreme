@@ -15,6 +15,7 @@ REM Controls:
 REM   During countdown:
 REM     C = force an immediate check
 REM     P = PAUSE polling (suspends all activity)
+REM     1-9 = set max items to pick up per cycle, then check immediately
 REM   While paused:
 REM     Any key = resume + trigger immediate check
 REM
@@ -37,14 +38,20 @@ set INTERVAL_ACTIVE=600
 set INTERVAL_QUIET=1800
 set TAG_USER=danielsawitzki77-remote
 set "MARKER_FILE=%TEMP%\kiro_no_work.tmp"
+set "MAX_ITEMS=1"
+
+REM Compute short display path: .../github/... with forward slashes
+set "GITHUB_ROOT=c:\Users\Daniel Sawitzki\Desktop\github"
+call :make_display_path "%WORK_DIR%"
 
 echo ============================================================
 echo  Kiro Issue Worker - Adaptive Polling
 echo  Active hours (8am-10pm PST): every %INTERVAL_ACTIVE%s
 echo  Quiet hours (10pm-8am PST):  every %INTERVAL_QUIET%s
-echo  During countdown: C=check now, P=pause polling
+echo  During countdown: C=check now, P=pause, 1-9=set max items
 echo  While paused: any key resumes + triggers immediate check
-echo  Working directory: %WORK_DIR%
+echo  Working directory: %DISPLAY_PATH%
+echo  Max items per cycle: %MAX_ITEMS%
 echo  Press Ctrl+C to stop
 echo ============================================================
 echo.
@@ -90,7 +97,7 @@ REM Delete marker file before running
 if exist "%MARKER_FILE%" del "%MARKER_FILE%"
 
 REM Run Kiro CLI with instruction to read the combined steering file first.
-kiro-cli chat --no-interactive --trust-all-tools "FIRST: Read the file c:\Users\Daniel Sawitzki\Desktop\github\Game-Dev-Supreme\cli-steering-combined.md — it contains all project steering docs (issue workflow, visual testing pipeline, SDL/picojson library context, game design docs). Follow ALL instructions in that file as your operational guide. THEN: Check all monitored GitHub repos for open issues. Run: gh issue list --repo danielsawitzki77/Zeitgeist-Evolved --state open --json number,title,labels,assignees,createdAt, then gh issue list --repo danielsawitzki77/SDL_VisualTest --state open --json number,title,labels,assignees,createdAt, then gh issue list --repo danielsawitzki77/Super-Civ-16 --state open --json number,title,labels,assignees,createdAt, then gh issue list --repo danielsawitzki77/TerrorForm --state open --json number,title,labels,assignees,createdAt, then gh issue list --repo danielsawitzki77/Game-Dev-Supreme --state open --json number,title,labels,assignees,createdAt. Pick the highest-priority open issue (excluding any with the Draft label) and work on it following the full workflow from the steering docs. If no actionable issues are found, just report that and stop. SIGNAL: If you found no actionable work, write the word NO_WORK to the file: %MARKER_FILE%"
+kiro-cli chat --no-interactive --trust-all-tools "FIRST: Read the file c:\Users\Daniel Sawitzki\Desktop\github\Game-Dev-Supreme\cli-steering-combined.md — it contains all project steering docs (issue workflow, visual testing pipeline, SDL/picojson library context, game design docs). Follow ALL instructions in that file as your operational guide. THEN: Check all monitored GitHub repos for open issues. Run: gh issue list --repo danielsawitzki77/Zeitgeist-Evolved --state open --json number,title,labels,assignees,createdAt, then gh issue list --repo danielsawitzki77/SDL_VisualTest --state open --json number,title,labels,assignees,createdAt, then gh issue list --repo danielsawitzki77/Super-Civ-16 --state open --json number,title,labels,assignees,createdAt, then gh issue list --repo danielsawitzki77/TerrorForm --state open --json number,title,labels,assignees,createdAt, then gh issue list --repo danielsawitzki77/Game-Dev-Supreme --state open --json number,title,labels,assignees,createdAt. Pick up to %MAX_ITEMS% highest-priority open issues (excluding any with the Draft label) and work on them following the full workflow from the steering docs. Process them sequentially, one at a time. If no actionable issues are found, just report that and stop. SIGNAL: If you found no actionable work, write the word NO_WORK to the file: %MARKER_FILE%"
 
 echo.
 echo [%date% %time%] Cycle complete.
@@ -101,14 +108,15 @@ if exist "%MARKER_FILE%" (
     echo  Kiro Issue Worker - Adaptive Polling
     echo  Active hours ^(8am-10pm PST^): every %INTERVAL_ACTIVE%s
     echo  Quiet hours ^(10pm-8am PST^):  every %INTERVAL_QUIET%s
-    echo  During countdown: C=check now, P=pause polling
+    echo  During countdown: C=check now, P=pause, 1-9=set max items
     echo  While paused: any key resumes + triggers immediate check
-    echo  Working directory: %WORK_DIR%
+    echo  Working directory: %DISPLAY_PATH%
+    echo  Max items per cycle: %MAX_ITEMS%
     echo  Press Ctrl+C to stop
     echo ============================================================
     echo.
     echo No actionable issues found. Waiting %INTERVAL_SEC% seconds...
-    echo Press C to check immediately, or P to pause.
+    echo Press C to check immediately, P to pause, or 1-9 to set max items per cycle.
     echo.
     call :wait_with_pause %INTERVAL_SEC%
 ) else (
@@ -138,8 +146,9 @@ REM Subroutine: wait_with_pause
 REM Waits for the specified number of seconds using 5-second
 REM intervals with choice /T. If the user presses P, sets
 REM PAUSED=1 and returns. If C is pressed, returns immediately
-REM to trigger the next check. If the timeout elapses fully,
-REM returns normally.
+REM to trigger the next check. If a number 1-9 is pressed, sets
+REM MAX_ITEMS to that value and returns immediately. If the
+REM timeout elapses fully, returns normally.
 REM
 REM Usage: call :wait_with_pause <seconds>
 REM ============================================================
@@ -151,8 +160,8 @@ if %WAIT_REMAINING% LEQ 0 (
     goto :eof
 )
 REM Use PowerShell to write carriage-return based overwrite (reliable across terminals)
-powershell -NoProfile -Command "Write-Host -NoNewline \"`r   [%WAIT_REMAINING%s remaining] P=pause, C=check now   `r\""
-choice /C PCN /N /T 5 /D N >nul 2>&1
+powershell -NoProfile -Command "Write-Host -NoNewline \"`r   [%WAIT_REMAINING%s remaining] P=pause, C=check now, 1-9=max items   `r\""
+choice /C PC123456789N /N /T 5 /D N >nul 2>&1
 if %errorlevel%==1 (
     REM P was pressed — enter pause mode
     echo.
@@ -162,6 +171,60 @@ if %errorlevel%==1 (
 if %errorlevel%==2 (
     REM C was pressed — user wants immediate check
     echo.
+    goto :eof
+)
+if %errorlevel%==3 (
+    set "MAX_ITEMS=1"
+    echo.
+    echo Max items per cycle set to: 1
+    goto :eof
+)
+if %errorlevel%==4 (
+    set "MAX_ITEMS=2"
+    echo.
+    echo Max items per cycle set to: 2
+    goto :eof
+)
+if %errorlevel%==5 (
+    set "MAX_ITEMS=3"
+    echo.
+    echo Max items per cycle set to: 3
+    goto :eof
+)
+if %errorlevel%==6 (
+    set "MAX_ITEMS=4"
+    echo.
+    echo Max items per cycle set to: 4
+    goto :eof
+)
+if %errorlevel%==7 (
+    set "MAX_ITEMS=5"
+    echo.
+    echo Max items per cycle set to: 5
+    goto :eof
+)
+if %errorlevel%==8 (
+    set "MAX_ITEMS=6"
+    echo.
+    echo Max items per cycle set to: 6
+    goto :eof
+)
+if %errorlevel%==9 (
+    set "MAX_ITEMS=7"
+    echo.
+    echo Max items per cycle set to: 7
+    goto :eof
+)
+if %errorlevel%==10 (
+    set "MAX_ITEMS=8"
+    echo.
+    echo Max items per cycle set to: 8
+    goto :eof
+)
+if %errorlevel%==11 (
+    set "MAX_ITEMS=9"
+    echo.
+    echo Max items per cycle set to: 9
     goto :eof
 )
 REM N was selected (timeout elapsed) — decrement and continue
@@ -182,7 +245,9 @@ set "REPO_PATH=%~1"
 if not exist "%REPO_PATH%\.git" goto :eof
 
 pushd "%REPO_PATH%"
-echo [Cleanup] %REPO_PATH%
+call set "CB_REL=%%REPO_PATH:*\github\=%%"
+set "CB_DISPLAY=.../github/%CB_REL:\=/%"
+echo [Cleanup] %CB_DISPLAY%
 
 REM Fetch and prune stale remote tracking branches
 git fetch --prune >nul 2>&1
@@ -207,4 +272,20 @@ for /f "tokens=1" %%b in ('git branch --merged main 2^>nul') do (
 )
 
 popd
+goto :eof
+
+REM ============================================================
+REM Subroutine: make_display_path
+REM Converts an absolute path to a short display path starting
+REM at .../github/... with forward slashes.
+REM Sets DISPLAY_PATH variable.
+REM
+REM Usage: call :make_display_path "c:\Users\...\github\MyRepo"
+REM ============================================================
+:make_display_path
+set "FULL_PATH=%~1"
+REM Extract the portion after the github root
+call set "REL_PART=%%FULL_PATH:*\github\=%%"
+REM Build display path with forward slashes
+set "DISPLAY_PATH=.../github/%REL_PART:\=/%"
 goto :eof
