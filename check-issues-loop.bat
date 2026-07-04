@@ -76,6 +76,7 @@ call :cleanup_branches "c:\Users\Daniel Sawitzki\Desktop\github\Zeitgeist Evolve
 call :cleanup_branches "c:\Users\Daniel Sawitzki\Desktop\github\SDL_VisualTest"
 call :cleanup_branches "c:\Users\Daniel Sawitzki\Desktop\github\Super Civ 16"
 call :cleanup_branches "c:\Users\Daniel Sawitzki\Desktop\github\TerrorForm"
+call :cleanup_branches "c:\Users\Daniel Sawitzki\Desktop\github\Particluar"
 
 REM --- Rebuild combined steering docs from all repos ---
 echo [%date% %time%] Rebuilding CLI steering context...
@@ -144,17 +145,24 @@ REM Usage: call :wait_with_pause <seconds>
 REM ============================================================
 :wait_with_pause
 set /a "WAIT_REMAINING=%~1"
+REM Create a carriage return character in variable CR
+for /f %%A in ('copy /Z "%~dpf0" nul') do set "CR=%%A"
 :wait_loop
-if %WAIT_REMAINING% LEQ 0 goto :eof
-echo    [%WAIT_REMAINING%s remaining] P=pause, C=check now
+if %WAIT_REMAINING% LEQ 0 (
+    echo.
+    goto :eof
+)
+<nul set /p "=%CR%   [%WAIT_REMAINING%s remaining] P=pause, C=check now   "
 choice /C PCN /N /T 5 /D N >nul 2>&1
 if %errorlevel%==1 (
     REM P was pressed — enter pause mode
+    echo.
     set "PAUSED=1"
     goto :eof
 )
 if %errorlevel%==2 (
     REM C was pressed — user wants immediate check
+    echo.
     goto :eof
 )
 REM N was selected (timeout elapsed) — decrement and continue
