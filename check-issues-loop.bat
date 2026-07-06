@@ -120,8 +120,15 @@ if exist "%MARKER_FILE%" (
     echo.
     call :wait_with_input %INTERVAL_SEC%
 ) else (
-    echo Work was processed! Re-checking immediately for more issues...
+    echo Work was processed!
     echo.
+    echo ============================================================
+    echo  Cycle done. Choose next action:
+    echo  C = check now ^(unlimited^)    Q = quit
+    echo  1-9 = set max items and check
+    echo ============================================================
+    echo.
+    call :pause_choice
 )
 
 REM Check exit/pause flags
