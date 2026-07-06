@@ -101,17 +101,17 @@ REM Delete marker file before running
 if exist "%MARKER_FILE%" del "%MARKER_FILE%"
 
 REM Run Kiro CLI with instruction to read the combined steering file first.
-kiro-cli chat --no-interactive --trust-all-tools "FIRST: Read the file c:\Users\Daniel Sawitzki\Desktop\github\Game-Dev-Supreme\cli-steering-combined.md — it contains all project steering docs (issue workflow, visual testing pipeline, SDL/picojson library context, game design docs). Follow ALL instructions in that file as your operational guide. THEN: Check all monitored GitHub repos for open issues. Run: gh issue list --repo danielsawitzki77/Zeitgeist-Evolved --state open --json number,title,labels,assignees,createdAt, then gh issue list --repo danielsawitzki77/SDL_VisualTest --state open --json number,title,labels,assignees,createdAt, then gh issue list --repo danielsawitzki77/Super-Civ-16 --state open --json number,title,labels,assignees,createdAt, then gh issue list --repo danielsawitzki77/TerrorForm --state open --json number,title,labels,assignees,createdAt, then gh issue list --repo danielsawitzki77/Game-Dev-Supreme --state open --json number,title,labels,assignees,createdAt. %PICKUP_INSTRUCTION% If no actionable issues are found, just report that and stop. SIGNAL: If you found no actionable work, write the word NO_WORK to the file: %MARKER_FILE%"
+kiro-cli chat --no-interactive --trust-all-tools "FIRST: Read the file c:\Users\Daniel Sawitzki\Desktop\github\Game-Dev-Supreme\cli-steering-combined.md - it contains all project steering docs (issue workflow, visual testing pipeline, SDL/picojson library context, game design docs). Follow ALL instructions in that file as your operational guide. THEN: Check all monitored GitHub repos for open issues. Run: gh issue list --repo danielsawitzki77/Zeitgeist-Evolved --state open --json number,title,labels,assignees,createdAt, then gh issue list --repo danielsawitzki77/SDL_VisualTest --state open --json number,title,labels,assignees,createdAt, then gh issue list --repo danielsawitzki77/Super-Civ-16 --state open --json number,title,labels,assignees,createdAt, then gh issue list --repo danielsawitzki77/TerrorForm --state open --json number,title,labels,assignees,createdAt, then gh issue list --repo danielsawitzki77/Game-Dev-Supreme --state open --json number,title,labels,assignees,createdAt. %PICKUP_INSTRUCTION% If no actionable issues are found, just report that and stop. SIGNAL: If you found no actionable work, write the word NO_WORK to the file: %MARKER_FILE%"
 
 echo.
 echo [%date% %time%] Cycle complete.
 
-REM Reset max items after use — next cycle defaults to unlimited unless user picks again
+REM Reset max items after use - next cycle defaults to unlimited unless user picks again
 set "MAX_ITEMS=0"
 set "DO_QUIT=0"
 set "PAUSED=0"
 
-REM Check if Kiro found no work — if marker exists, wait; otherwise re-run immediately
+REM Check if Kiro found no work - if marker exists, wait; otherwise re-run immediately
 if exist "%MARKER_FILE%" (
     call :print_banner
     echo.
@@ -187,25 +187,25 @@ if %WAIT_REMAINING% LEQ 0 (
 powershell -NoProfile -Command "Write-Host -NoNewline \"`r   [%WAIT_REMAINING%s remaining] C=check P=pause Q=quit 1-9=max   `r\""
 choice /C PCQN123456789 /N /T 5 /D N >nul 2>&1
 if %errorlevel%==1 (
-    REM P — pause
+    REM P - pause
     echo.
     set "PAUSED=1"
     goto :eof
 )
 if %errorlevel%==2 (
-    REM C — immediate check, unlimited
+    REM C - immediate check, unlimited
     echo.
     set "MAX_ITEMS=0"
     goto :eof
 )
 if %errorlevel%==3 (
-    REM Q — quit
+    REM Q - quit
     echo.
     set "DO_QUIT=1"
     goto :eof
 )
 if %errorlevel%==4 (
-    REM N — timeout elapsed
+    REM N - timeout elapsed
     set /a "WAIT_REMAINING=WAIT_REMAINING - 5"
     goto :wait_loop
 )
@@ -213,7 +213,7 @@ REM errorlevel 5-13 = keys 1-9
 set /a "NUM_PRESSED=%errorlevel% - 4"
 set "MAX_ITEMS=%NUM_PRESSED%"
 echo.
-echo  Selected max items: %MAX_ITEMS% — pausing for confirmation...
+echo  Selected max items: %MAX_ITEMS% - pausing for confirmation...
 set "PAUSED=1"
 goto :eof
 
@@ -229,13 +229,13 @@ REM ============================================================
 :pause_choice_loop
 choice /C CQ123456789 /N /M "  > "
 if %errorlevel%==1 (
-    REM C — unlimited
+    REM C - unlimited
     set "MAX_ITEMS=0"
     set "PAUSED=0"
     goto :eof
 )
 if %errorlevel%==2 (
-    REM Q — quit
+    REM Q - quit
     set "DO_QUIT=1"
     set "PAUSED=0"
     goto :eof
