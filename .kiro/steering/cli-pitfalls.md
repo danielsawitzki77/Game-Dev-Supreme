@@ -93,6 +93,26 @@ Pattern:
 
 ---
 
+## Image URLs from Issues
+
+When extracting image URLs from GitHub issue bodies/comments (e.g., from `<img src="...">` or `![alt](url)` markdown), the URL may get corrupted with backslashes on Windows (`https:\github.com\...` instead of `https://github.com/...`).
+
+**Before using any extracted URL:**
+- Verify it starts with `https://` (forward slashes)
+- If backslashes are present, replace them: the URL should be `https://github.com/user-attachments/assets/<id>`
+- When passing the URL to image-viewing tools, ensure forward slashes are used
+- **Do NOT attempt the image-reading tool directly on GitHub user-attachment URLs** — they often fail validation. Instead, download to a temp file first, then read the local file.
+
+**For downloading images:** Always write a .ps1 script (per the PowerShell variables rule) rather than using inline `$env:TEMP`:
+```powershell
+$url = 'https://github.com/user-attachments/assets/abc123'
+$out = Join-Path $env:TEMP 'screenshot.png'
+Invoke-WebRequest -Uri $url -OutFile $out
+Write-Host $out
+```
+
+---
+
 ## Already-Complete Issues
 
 When scanning issues, if a Kiro completion comment (`✅ Work complete`) already exists AND there are no unprocessed human comments, **skip the issue immediately**. Do not re-read the full issue body or check PR comments unless there's evidence of new activity (unprocessed human comments without 👀 reactions).
