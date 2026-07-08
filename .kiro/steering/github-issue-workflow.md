@@ -413,6 +413,60 @@ gh pr create --repo <owner/repo> --title "<title>" --body-file <temp-file> --hea
 gh pr edit <pr-number> --repo <owner/repo> --add-assignee <assignee1>,<assignee2>
 ```
 
+## IDE-Triggered Work (Kiro IDE Sessions)
+
+When work is triggered from the Kiro IDE (interactive chat sessions, as opposed to the CLI/issue-checker polling loop), it must be documented in GitHub the same way as issue-driven work.
+
+### Issue Creation
+
+1. **Always create a tracking issue** in `danielsawitzki77/Game-Dev-Supreme` for any IDE-triggered work session that results in code changes or meaningful actions.
+2. **Issue title** must match the name of the IDE conversation (the user's initial prompt or conversation title).
+3. **Issue body** should summarize the task/request from the conversation.
+4. **Labels**: Add `ide-triggered` label to distinguish from manually filed issues. Add other relevant labels (project name, priority) as appropriate.
+
+### Documentation Requirements
+
+All the same communication rules apply as for issue-driven work:
+
+- **All comments** prefixed with `🤖 [Kiro]`
+- **Tag the user**: Every comment ends with a blank line followed by `cc @danielsawitzki77-remote`
+- **Use `--body-file`** for all comments and PR bodies (never inline `--body` with newlines)
+- **React with 👀** on the issue when starting work
+- **React with 👍** on the issue when work is complete
+- **Post progress updates** as comments when reaching significant milestones
+- **Post a completion comment** summarizing what was done, linking any PRs created
+- **Do NOT close the issue** — leave it open for human review/approval, same as any other issue
+
+### PR Linking
+
+If the IDE work results in a PR:
+
+- Create the PR in the **target project's repo** (not necessarily Game-Dev-Supreme)
+- Link the tracking issue in the PR body using fully-qualified references: `Addresses danielsawitzki77/Game-Dev-Supreme#<number>`
+- Post the full PR URL back on the tracking issue
+- Assign `danielsawitzki77` and request review from `danielsawitzki77-remote`
+
+### When NOT to Create an Issue
+
+Skip issue creation for:
+- Pure Q&A / informational questions with no code changes
+- Exploratory conversations that don't result in any action
+- Conversations where the user explicitly says not to create an issue
+
+### Workflow Summary
+
+```
+1. User starts IDE conversation
+2. Kiro determines work will produce changes
+3. Create issue in Game-Dev-Supreme with conversation name as title
+4. React 👀 on the issue
+5. Post pickup comment
+6. Do the work (branch, commit, PR — same as issue-driven flow)
+7. Post completion comment with PR link
+8. React 👍 on the issue
+9. Leave issue open for human approval
+```
+
 ## Important Notes
 
 - This workflow is non-interactive. Do not ask the user for confirmation during issue work.
