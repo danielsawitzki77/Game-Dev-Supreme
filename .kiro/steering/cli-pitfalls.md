@@ -122,3 +122,38 @@ Check for completion efficiently:
 gh api repos/<owner>/<repo>/issues/<number>/comments --jq "[.[] | select(.body | startswith(\"🤖 [Kiro]\") | not) | select(.reactions.eyes == 0)] | length"
 ```
 If this returns 0, there's nothing to do — move on.
+
+---
+
+## Code Style Compliance (CRITICAL)
+
+**Before writing ANY code in a target project, read that project's `code-style.md` steering doc.** The combined steering file contains per-project style guides — they are NOT optional.
+
+### Mandatory Pre-Implementation Checklist
+
+Before writing a single line of code:
+1. Identify the target project (Particluar, Zeitgeist Evolved, etc.)
+2. Find and re-read the relevant `code-style.md` section in the combined steering
+3. Apply ALL naming conventions from the identifier table — no exceptions
+4. Verify your variable names match the convention BEFORE committing
+
+### Common Violations to Watch For
+
+- **Local variables must be `camelCase`** — NOT `snake_case`, NOT `PascalCase`
+- **Methods must be `PascalCase`** — NOT `camelCase`
+- **Member variables must be `m_camelCase`** — NOT `m_PascalCase`, NOT bare names
+- **No static free functions** for reusable logic — use class methods
+- **No math/geometry helpers in main.cpp or test main files** — they belong in `math_lib/`
+- **File names must be PascalCase** — `ConnectionValidator.h`, NOT `connection_validator.h`
+
+### OOP and Architecture Rules
+
+Every monitored project follows OOP-first design:
+- Logic belongs in classes, not free functions
+- Static functions are allowed ONLY for trivial one-off helpers (< 10 lines, single file)
+- Math helpers (dot product, normalize, distance, interpolation, projection, etc.) belong in the project's `math_lib/` — NEVER in `main.cpp` or test files
+- If you find yourself adding a helper function to a `.cpp` file, ask: "Does this belong in a library class?" — the answer is almost always yes
+
+### Enforcement
+
+If a PR is created with code style violations, the human reviewer will reject it and you'll have to fix it — wasting an entire cycle. Get it right the first time.
