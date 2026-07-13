@@ -50,17 +50,25 @@ The application entry point (`main.cpp`) must:
 
 ## Folder Naming
 - All lowercase, underscore-separated: `body_renderer`, `tile_renderer`, `math_lib`
+- These are filesystem folder names only — NOT Visual Studio project/filter names
+
+## Visual Studio Project & Filter Naming
+- PascalCase, no underscores: `BodyRenderer`, `TileRenderer`, `MathLib`, `BodyRendererTests`
+- The `.vcxproj` file name matches the project name: `BodyRenderer.vcxproj`
+- Solution folders / filters also use PascalCase: `BodyRenderer`, `Tests`
 
 ## File Naming
 - Source files (`.cpp`, `.h`): PascalCase — `BodyTypes.h`, `WFCGenerator.cpp`, `TestBodyLoader.cpp`
 - vcxproj files: PascalCase — `TileRenderer.vcxproj`, `BodyViewer.vcxproj`
 
-## Subsystem Prefixes (Particluar-specific, others may vary)
-| Prefix | Domain |
-|--------|--------|
+## Subsystem Prefixes (folder names only)
+| Folder prefix | Domain |
+|---------------|--------|
 | `tile_` | 2D tile/map rendering and WFC generation |
 | `body_` | 3D body/shape rendering and joint system |
 | `math_` | Shared math library |
+
+These prefixes apply **only to filesystem folder names**. The corresponding VS project names use PascalCase without underscores (e.g., folder `body_renderer/` → VS project `BodyRenderer`).
 
 ## Code Identifiers
 
