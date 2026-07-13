@@ -20,6 +20,24 @@ Invoke-WebRequest -Uri 'https://...' -OutFile 'path'
 
 ---
 
+## MSBuild / Visual Studio Builds
+
+**`msbuild` is NOT on PATH by default.** Running `msbuild` directly will fail with "not recognized". You must use the full path or initialize the VS environment first.
+
+**Preferred pattern — use full path via vswhere:**
+```
+cmd /c ""%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" -latest -find MSBuild\**\Bin\MSBuild.exe" /p:Configuration=Debug /p:Platform=x64 MySolution.sln
+```
+
+**Or initialize the VS dev environment first:**
+```
+cmd /c ""C:\Program Files\Microsoft Visual Studio\18\Community\Common7\Tools\VsDevCmd.bat" && msbuild /p:Configuration=Debug /p:Platform=x64 MySolution.sln"
+```
+
+**Never just run `msbuild ...`** — it will always fail in a plain shell session.
+
+---
+
 ## PowerShell Variables
 
 **Never pass PowerShell code with `$variables` inline in a shell command.** The `$` will be stripped or misinterpreted.
