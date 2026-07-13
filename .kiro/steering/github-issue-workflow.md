@@ -358,6 +358,26 @@ Issues often reference PRs (created by Kiro or humans). These PRs may receive re
 
 5. **Priority** — PR comments are treated as follow-ups to their parent issue. They share the same priority tier as the issue. Process them during the same cycle as the issue check.
 
+### Scanning ALL Open PRs (Orphan PR Detection)
+
+**Critical:** A PR can have unprocessed comments even if its parent issue is closed. The issue-referenced PR check above only finds PRs linked from OPEN issues. To catch orphaned PRs, **also scan all open PRs directly across all repos each cycle:**
+
+```bash
+gh pr list --repo danielsawitzki77/Zeitgeist-Evolved --state open --json number,title,headRefName
+gh pr list --repo danielsawitzki77/SDL_VisualTest --state open --json number,title,headRefName
+gh pr list --repo danielsawitzki77/Super-Civ-16 --state open --json number,title,headRefName
+gh pr list --repo danielsawitzki77/TerrorForm --state open --json number,title,headRefName
+gh pr list --repo danielsawitzki77/Game-Dev-Supreme --state open --json number,title,headRefName
+gh pr list --repo danielsawitzki77/Particluar --state open --json number,title,headRefName
+```
+
+For each open PR found:
+1. Fetch its comments (same as step 2 above)
+2. Check for unprocessed human comments (no 👀 reaction, not prefixed with `🤖 [Kiro]`)
+3. If found, process them — check out the branch, implement changes, push, reply
+
+This ensures feedback on open PRs is never missed, regardless of whether the parent issue is still open.
+
 ### After Completing Work on an Issue
 
 After finishing work on one issue, **immediately check for the next issue** across all repos. This includes:
