@@ -4,10 +4,14 @@ These rules apply specifically to headless kiro-cli runs on Windows CMD. Followi
 
 ---
 
-## Shell Commands
+## Shell Commands (ZERO TOLERANCE — get this right on the FIRST attempt)
 
-**The kiro-cli shell tool uses PowerShell by default on Windows.** Do NOT use CMD syntax (`&&`, `&`, `cd /d`). Instead:
+**The kiro-cli shell tool uses PowerShell by default on Windows.** The following are ILLEGAL and will ALWAYS fail:
+- `&&` — NEVER use this. It is not valid in PowerShell.
+- `&` (bare) — NEVER use this as a command separator.
+- `cd /d` — NEVER use this. It's CMD syntax.
 
+**Correct patterns:**
 - Chain commands with `;` (PowerShell separator)
 - Use `Set-Location` or provide `cwd` parameter if available
 - For commands that MUST run in CMD (e.g., batch files), wrap with: `cmd /c "command here"`
