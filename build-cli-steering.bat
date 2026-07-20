@@ -28,6 +28,7 @@ set "REPO_3=SDL_VisualTest"
 set "REPO_4=Super Civ 16"
 set "REPO_5=TerrorForm"
 set "REPO_6=Particluar"
+set "REPO_7=Artsy_2000"
 
 REM Start with a header
 echo # Combined CLI Steering Context> "%OUTPUT%"
@@ -49,7 +50,7 @@ REM then the rest. First occurrence of each filename wins.
 set "INCLUDED_FILES="
 
 REM Process each repo
-for %%R in (1 2 3 4 5 6) do (
+for %%R in (1 2 3 4 5 6 7) do (
     set "REPO_NAME=!REPO_%%R!"
     set "STEERING_DIR=%GITHUB_ROOT%\!REPO_NAME!\.kiro\steering"
 
